@@ -26,6 +26,7 @@ dev = [
     "types-PyYAML>=6.0",
     "types-boto3[s3]>=1.43.127",
     "pre-commit>=4.7.0",
+    "types-defusedxml>=0.7.0.20260504",
 ]
 
 [tool.ruff]
@@ -54,6 +55,23 @@ module = [
     "magic.*",
 ]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "confere_synth.ruido",
+    "confere_synth.compostos",
+    "test_compostos",
+    "confere_core.ingest.render",
+    "confere_core.ingest",
+    "confere_core.ingest.separar",
+    "test_cte",
+    "test_ruido",
+    "test_cli",
+    "test_render_pdf",
+    "test_classificar_pdf",
+    "test_separar",
+]
+disallow_untyped_calls = false  # a API do PyMuPDF (pymupdf.open) não é tipada
 
 [tool.pytest.ini_options]
 testpaths = ["packages/core/tests", "packages/synth/tests", "apps/api/tests", "eval/tests"]
