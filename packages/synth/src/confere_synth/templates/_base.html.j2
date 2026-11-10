@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="{% block lang %}pt-BR{% endblock %}">
+<head>
+<meta charset="utf-8">
+<title>{{ doc.numero }}</title>
+<meta name="generator" content="confere-synth">
+<meta name="dcterms.created" content="{{ doc.emissao.isoformat() }}T00:00:00Z">
+<meta name="dcterms.modified" content="{{ doc.emissao.isoformat() }}T00:00:00Z">
+<style>
+@page {
+  size: A4;
+  margin: 14mm;
+  @bottom-center {
+    content: "SINTÉTICO — dados fictícios";
+    font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+    font-size: 6.5pt;
+    color: #a0a0a0;
+    letter-spacing: 0.08em;
+  }
+}
+* { box-sizing: border-box; }
+html { font-size: 10pt; }
+body {
+  margin: 0;
+  color: #1c1c1c;
+  line-height: 1.35;
+  font-family: {% block fonte %}"DejaVu Sans", "Liberation Sans", Arial, sans-serif{% endblock %};
+}
+h1, h2, h3, p { margin: 0; }
+table { border-collapse: collapse; width: 100%; }
+th, td { vertical-align: top; text-align: left; }
+.num { text-align: right; white-space: nowrap; }
+.mono { font-family: "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace; }
+.muted { color: #666; }
+.small { font-size: 8pt; }
+.cab td { padding: 0; }
+.direita { text-align: right; }
+{% block css %}{% endblock %}
+</style>
+</head>
+<body>
+{% block corpo %}{% endblock %}
+</body>
+</html>

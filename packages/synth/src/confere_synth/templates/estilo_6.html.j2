@@ -1,0 +1,70 @@
+{% extends "_base.html.j2" %}
+{% block lang %}en{% endblock %}
+{% block css %}
+.pagina { page-break-after: always; }
+.pagina.ultima { page-break-after: auto; }
+.topo { border-bottom: 2px solid #5b2a86; padding-bottom: 4mm; margin-bottom: 5mm; }
+.topo td { padding: 0; }
+.topo .emissor { font-size: 13pt; font-weight: bold; color: #5b2a86; }
+.topo .tipo { text-align: right; font-size: 17pt; font-weight: bold; letter-spacing: 0.1em; color: #5b2a86; }
+.resumo td { padding: 0.7mm 0; font-size: 9pt; }
+.resumo .k { width: 30mm; color: #666; }
+.extrato { margin-top: 5mm; }
+.extrato th { background: #efe7f6; color: #3d1b5c; padding: 1.8mm 2mm; font-size: 8pt; border-bottom: 1.5px solid #5b2a86; }
+.extrato td { padding: 1.5mm 2mm; border-bottom: 1px solid #e3dceb; font-size: 8.5pt; }
+.extrato tr:nth-child(even) td { background: #faf7fd; }
+.pag { margin-top: 4mm; font-size: 8pt; color: #777; text-align: right; }
+.total { width: 80mm; margin: 6mm 0 0 auto; }
+.total td { padding: 2mm 3mm; background: #5b2a86; color: #fff; font-weight: bold; font-size: 11pt; }
+.obs { margin-top: 7mm; font-size: 8.5pt; color: #444; }
+{% endblock %}
+{% block corpo %}
+{% set paginas = (linhas|batch(linhas_por_pagina)|list) or [[]] %}
+{% for pagina in paginas %}
+<section class="pagina{{ ' ultima' if loop.last else '' }}">
+  <table class="topo">
+    <tr>
+      <td class="emissor">{{ fornecedor.nome }}<div class="small muted" style="font-weight: normal">{{ fornecedor.endereco }} · {{ fornecedor.email }}</div></td>
+      <td class="tipo">STATEMENT</td>
+    </tr>
+  </table>
+
+  {% if loop.first %}
+  <table class="resumo">
+    <tr><td class="k">Statement No.</td><td><strong>{{ doc.numero }}</strong></td></tr>
+    <tr><td class="k">Date</td><td>{{ doc.emissao|data_en }}</td></tr>
+    <tr><td class="k">Account</td><td>{{ tomador.nome }}</td></tr>
+    <tr><td class="k">Currency</td><td>{{ doc.moeda }}</td></tr>
+    <tr><td class="k">Open items</td><td>{{ linhas|length }}</td></tr>
+  </table>
+  {% endif %}
+
+  <table class="extrato">
+    <thead>
+      <tr>
+        <th>Invoice No</th><th>B/L</th><th>Container</th><th>Description</th>
+        <th class="num">Amount ({{ doc.moeda }})</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in pagina %}
+      <tr>
+        <td>{{ l.fatura_no or "—" }}</td>
+        <td>{{ l.bl or "—" }}</td>
+        <td class="mono">{{ l.container or "—" }}</td>
+        <td>{{ l.descricao }}</td>
+        <td class="num">{{ l.valor|num_en }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pag">Page {{ loop.index }} of {{ paginas|length }}</div>
+
+  {% if loop.last %}
+  <table class="total"><tr><td>TOTAL DUE {{ doc.moeda }}</td><td class="num">{{ doc.total|num_en }}</td></tr></table>
+  {% if doc.observacoes %}<p class="obs">{{ doc.observacoes }}</p>{% endif %}
+  {% endif %}
+</section>
+{% endfor %}
+{% endblock %}

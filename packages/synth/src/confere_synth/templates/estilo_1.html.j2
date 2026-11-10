@@ -1,0 +1,111 @@
+{% extends "_base.html.j2" %}
+{% block lang %}en{% endblock %}
+{% block css %}
+.faixa { border-bottom: 3px solid #12355b; padding-bottom: 6mm; margin-bottom: 7mm; }
+.marca td { vertical-align: middle; }
+.marca .nome { font-size: 13pt; font-weight: bold; color: #12355b; padding-left: 3mm; }
+.titulo { font-size: 26pt; font-weight: bold; letter-spacing: 0.12em; color: #12355b; text-align: right; }
+.meta { margin-top: 2mm; font-size: 9pt; }
+.meta td { padding: 0.6mm 0 0.6mm 4mm; }
+.meta .k { color: #666; text-align: right; }
+.blocos td { width: 50%; padding-right: 6mm; }
+.rotulo { font-size: 7.5pt; letter-spacing: 0.1em; text-transform: uppercase; color: #12355b; font-weight: bold; margin-bottom: 1mm; }
+.remessa { margin: 7mm 0; border: 1px solid #c9d3df; background: #f4f7fb; padding: 3mm 4mm; }
+.remessa td { padding: 0.8mm 0; font-size: 9pt; }
+.remessa .k { width: 32mm; color: #555; }
+.itens { margin-top: 2mm; }
+.itens th { background: #12355b; color: #fff; padding: 2mm 2.5mm; font-size: 8.5pt; }
+.itens td { padding: 2mm 2.5mm; border-bottom: 1px solid #dde3ea; }
+.itens .ref { font-size: 7.5pt; color: #777; }
+.totais { width: 70mm; margin-left: auto; margin-top: 5mm; }
+.totais td { padding: 1.6mm 2.5mm; }
+.totais .total td { background: #12355b; color: #fff; font-weight: bold; font-size: 11pt; }
+.obs { margin-top: 9mm; font-size: 8.5pt; color: #444; }
+{% endblock %}
+{% block corpo %}
+<table class="cab faixa">
+  <tr>
+    <td>
+      <table class="marca">
+        <tr>
+          <td>
+            <svg width="44" height="44" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="21" fill="#12355b"/>
+              <path d="M2 28 Q 9 21 16 28 T 30 28 T 44 28 V 44 H 2 Z" fill="#3d8fd1"/>
+              <rect x="18" y="8" width="8" height="13" fill="#ffffff"/>
+              <rect x="14" y="14" width="16" height="5" fill="#ffffff"/>
+            </svg>
+          </td>
+          <td class="nome">{{ fornecedor.nome }}</td>
+        </tr>
+      </table>
+      <p class="small muted" style="margin-top: 2mm">{{ fornecedor.endereco }}<br>{{ fornecedor.email }}</p>
+    </td>
+    <td>
+      <div class="titulo">INVOICE</div>
+      <table class="meta">
+        <tr><td class="k">Invoice No.</td><td><strong>{{ doc.numero }}</strong></td></tr>
+        <tr><td class="k">Invoice date</td><td>{{ doc.emissao|data_en }}</td></tr>
+        {% if doc.vencimento %}
+        <tr><td class="k">Due date</td><td>{{ doc.vencimento|data_en }}</td></tr>
+        {% endif %}
+        <tr><td class="k">Currency</td><td>{{ doc.moeda }}</td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<table class="blocos">
+  <tr>
+    <td>
+      <div class="rotulo">Bill to</div>
+      <strong>{{ tomador.nome }}</strong><br>
+      {{ tomador.endereco }}
+      {% if tomador.cnpj %}<br>Tax ID: {{ tomador.cnpj }}{% endif %}
+    </td>
+    <td>
+      <div class="rotulo">Payment</div>
+      Please quote the invoice number when paying.<br>
+      {% if doc.vencimento %}Payable by {{ doc.vencimento|data_en }}.{% endif %}
+    </td>
+  </tr>
+</table>
+
+<table class="remessa">
+  <tr><td class="k">Bill of Lading</td><td>{{ processo_refs.bl_master or "—" }}{% if processo_refs.bl_house %} / House: {{ processo_refs.bl_house|join(", ") }}{% endif %}</td></tr>
+  <tr><td class="k">Vessel / Voyage</td><td>{{ processo_refs.navio or "—" }}{% if processo_refs.viagem %} / {{ processo_refs.viagem }}{% endif %}</td></tr>
+  <tr><td class="k">Containers</td><td class="mono">{{ processo_refs.conteineres|join(", ") or "—" }}</td></tr>
+  {% if processo_refs.ref_cliente %}
+  <tr><td class="k">Customer ref.</td><td>{{ processo_refs.ref_cliente }}</td></tr>
+  {% endif %}
+</table>
+
+<table class="itens">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th class="num">Qty</th>
+      <th class="num">Rate</th>
+      <th class="num">Amount ({{ doc.moeda }})</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in linhas %}
+    <tr>
+      <td>{{ l.descricao }}{% for r in l.refs_linha %}<div class="ref">{{ r }}</div>{% endfor %}</td>
+      <td class="num">{{ l.qtd|qtd_en }}</td>
+      <td class="num">{{ l.valor_unit|num_en }}</td>
+      <td class="num">{{ l.valor|num_en }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="totais">
+  <tr class="total"><td>TOTAL {{ doc.moeda }}</td><td class="num">{{ doc.total|num_en }}</td></tr>
+</table>
+
+{% if doc.observacoes %}
+<p class="obs"><strong>Notes:</strong> {{ doc.observacoes }}</p>
+{% endif %}
+{% endblock %}

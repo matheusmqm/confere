@@ -1,0 +1,67 @@
+{% extends "_base.html.j2" %}
+{% block fonte %}"DejaVu Serif", "Liberation Serif", Georgia, serif{% endblock %}
+{% block css %}
+.cab-doc { text-align: center; border-bottom: 1px solid #555; padding-bottom: 4mm; margin-bottom: 6mm; }
+.cab-doc .nome { font-size: 14pt; font-weight: bold; letter-spacing: 0.03em; }
+.cab-doc .titulo { margin-top: 3mm; font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.2em; }
+.partes td { padding: 0.8mm 0; font-size: 9.5pt; }
+.partes .k { width: 30mm; font-weight: bold; }
+.sec { margin: 7mm 0 1.5mm 0; font-size: 10pt; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 1mm; }
+.desp td, .desp th { padding: 1.6mm 1.5mm; font-size: 9.5pt; }
+.desp th { text-align: left; border-bottom: 1px solid #888; font-size: 8.5pt; }
+.desp td { border-bottom: 1px dotted #bbb; }
+.sub td { font-weight: bold; border-top: 1px solid #000; border-bottom: 0; padding-top: 2mm; }
+.geral { margin-top: 6mm; border: 2px solid #000; }
+.geral td { padding: 2.5mm 3mm; font-size: 12pt; font-weight: bold; }
+.texto { margin-top: 8mm; font-size: 9pt; text-align: justify; line-height: 1.5; }
+.texto h3 { font-size: 9pt; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5mm; }
+{% endblock %}
+{% block corpo %}
+{% set reembolsos = linhas|rejectattr("secao", "equalto", "honorario")|list %}
+{% set honorarios = linhas|selectattr("secao", "equalto", "honorario")|list %}
+<div class="cab-doc">
+  <div class="nome">{{ fornecedor.nome }}</div>
+  <div class="small muted">{{ fornecedor.endereco }}{% if fornecedor.cnpj %} · CNPJ {{ fornecedor.cnpj }} (fictício){% endif %} · {{ fornecedor.email }}</div>
+  <div class="titulo">Demonstrativo de Despesas</div>
+</div>
+
+<table class="partes">
+  <tr><td class="k">Nº</td><td>{{ doc.numero }}</td></tr>
+  <tr><td class="k">Data</td><td>{{ doc.emissao|data_pt }}{% if doc.vencimento %} · pagamento até {{ doc.vencimento|data_pt }}{% endif %}</td></tr>
+  <tr><td class="k">Cliente</td><td>{{ tomador.nome }}{% if tomador.cnpj %} · CNPJ {{ tomador.cnpj }}{% endif %}</td></tr>
+  <tr><td class="k">Referências</td><td>BL {{ processo_refs.bl_master or "—" }}{% if processo_refs.ref_cliente %} · {{ processo_refs.ref_cliente }}{% endif %}{% if processo_refs.conteineres %} · Ctr: {{ processo_refs.conteineres|join(", ") }}{% endif %}</td></tr>
+</table>
+
+<div class="sec">A. Reembolso de despesas</div>
+<table class="desp">
+  <thead><tr><th>Descrição</th><th class="num">Valor ({{ doc.moeda }})</th></tr></thead>
+  <tbody>
+    {% for l in reembolsos %}
+    <tr><td>{{ l.descricao }}{% for r in l.refs_linha %} <span class="small muted">[{{ r }}]</span>{% endfor %}</td><td class="num">{{ l.valor|num_pt }}</td></tr>
+    {% endfor %}
+    <tr class="sub"><td>Subtotal A</td><td class="num">{{ reembolsos|sum(attribute="valor")|num_pt }}</td></tr>
+  </tbody>
+</table>
+
+<div class="sec">B. Honorários</div>
+<table class="desp">
+  <thead><tr><th>Descrição</th><th class="num">Valor ({{ doc.moeda }})</th></tr></thead>
+  <tbody>
+    {% for l in honorarios %}
+    <tr><td>{{ l.descricao }}</td><td class="num">{{ l.valor|num_pt }}</td></tr>
+    {% endfor %}
+    <tr class="sub"><td>Subtotal B</td><td class="num">{{ honorarios|sum(attribute="valor")|num_pt }}</td></tr>
+  </tbody>
+</table>
+
+<table class="geral">
+  <tr><td>TOTAL GERAL (A + B)</td><td class="num">{{ doc.total|dinheiro_pt(doc.moeda) }}</td></tr>
+</table>
+
+{% if doc.observacoes %}
+<div class="texto">
+  <h3>Observações</h3>
+  <p>{{ doc.observacoes }}</p>
+</div>
+{% endif %}
+{% endblock %}

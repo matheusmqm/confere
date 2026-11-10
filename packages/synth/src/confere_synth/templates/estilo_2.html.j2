@@ -1,0 +1,63 @@
+{% extends "_base.html.j2" %}
+{% block lang %}en{% endblock %}
+{% block fonte %}"DejaVu Serif", "Liberation Serif", Georgia, "Times New Roman", serif{% endblock %}
+{% block css %}
+body { font-size: 10pt; }
+.cabecalho { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 4mm 0; margin-bottom: 7mm; }
+.cabecalho .emissor { font-size: 15pt; font-weight: bold; letter-spacing: 0.02em; }
+.cabecalho .tipo { font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.18em; text-align: right; }
+.cabecalho td { padding: 0; }
+.dados td { padding: 0.8mm 0; font-size: 9.5pt; }
+.dados .k { width: 28mm; font-style: italic; }
+.secao { margin: 7mm 0 2mm 0; font-weight: bold; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.12em; }
+.lista td { padding: 2mm 0 0.6mm 0; }
+.lista .desc { width: 100%; border-bottom: 1px dotted #888; }
+.lista .val { font-family: "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace; text-align: right; white-space: nowrap; padding-left: 3mm; width: 38mm; }
+.lista .ref td { padding: 0 0 1mm 6mm; font-size: 8pt; color: #555; border: 0; }
+.total-linha { margin-top: 4mm; border-top: 2px solid #000; }
+.total-linha td { padding-top: 2.5mm; font-weight: bold; font-size: 11.5pt; }
+.total-linha .val { font-family: "DejaVu Sans Mono", "Liberation Mono", "Courier New", monospace; text-align: right; }
+.nota { margin-top: 9mm; font-size: 8.5pt; color: #333; }
+{% endblock %}
+{% block corpo %}
+<table class="cabecalho cab">
+  <tr>
+    <td class="emissor">{{ fornecedor.nome }}</td>
+    <td class="tipo">Debit Note</td>
+  </tr>
+  <tr>
+    <td class="small muted">{{ fornecedor.endereco }} · {{ fornecedor.email }}</td>
+    <td class="small direita">No. {{ doc.numero }}</td>
+  </tr>
+</table>
+
+<table class="dados">
+  <tr><td class="k">To:</td><td><strong>{{ tomador.nome }}</strong>, {{ tomador.endereco }}</td></tr>
+  <tr><td class="k">Date:</td><td>{{ doc.emissao|data_en }}</td></tr>
+  {% if doc.vencimento %}<tr><td class="k">Payable by:</td><td>{{ doc.vencimento|data_en }}</td></tr>{% endif %}
+  <tr><td class="k">Currency:</td><td>{{ doc.moeda }}</td></tr>
+  {% if processo_refs.bl_master %}<tr><td class="k">Our ref (B/L):</td><td>{{ processo_refs.bl_master }}</td></tr>{% endif %}
+  {% if processo_refs.ref_agente %}<tr><td class="k">Agent ref:</td><td>{{ processo_refs.ref_agente }}</td></tr>{% endif %}
+  {% if processo_refs.ref_cliente %}<tr><td class="k">Your ref:</td><td>{{ processo_refs.ref_cliente }}</td></tr>{% endif %}
+  {% if processo_refs.navio %}<tr><td class="k">Vessel:</td><td>{{ processo_refs.navio }}{% if processo_refs.viagem %} V.{{ processo_refs.viagem }}{% endif %}</td></tr>{% endif %}
+</table>
+
+<div class="secao">Charges</div>
+<table class="lista">
+  {% for l in linhas %}
+  <tr>
+    <td class="desc">{{ l.descricao }}</td>
+    <td class="val">{{ l.moeda }} {{ l.valor|num_en }}</td>
+  </tr>
+  {% for r in l.refs_linha %}
+  <tr class="ref"><td colspan="2">{{ r }}</td></tr>
+  {% endfor %}
+  {% endfor %}
+</table>
+
+<table class="total-linha">
+  <tr><td>TOTAL DUE</td><td class="val">{{ doc.moeda }} {{ doc.total|num_en }}</td></tr>
+</table>
+
+{% if doc.observacoes %}<p class="nota">{{ doc.observacoes }}</p>{% endif %}
+{% endblock %}

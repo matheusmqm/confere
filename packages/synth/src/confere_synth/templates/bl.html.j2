@@ -1,0 +1,64 @@
+{% extends "_base.html.j2" %}
+{% block lang %}en{% endblock %}
+{% block css %}
+body { font-size: 9pt; }
+.moldura { border: 1.5px solid #222; }
+.moldura td, .moldura th { border: 1px solid #222; padding: 2mm 2.5mm; }
+.titulo { text-align: center; font-size: 20pt; font-weight: bold; letter-spacing: 0.18em; padding: 4mm 0; }
+.rot { font-size: 6.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: #555; }
+.valor { font-size: 9.5pt; margin-top: 0.8mm; }
+.grande { font-size: 11pt; font-weight: bold; }
+.cntr th { background: #ececec; font-size: 7pt; text-transform: uppercase; }
+.original { float: right; font-size: 8pt; border: 1px solid #222; padding: 0.8mm 2mm; letter-spacing: 0.1em; }
+.clausula { margin-top: 4mm; font-size: 7pt; color: #444; text-align: justify; line-height: 1.35; }
+{% endblock %}
+{% block corpo %}
+<table class="moldura">
+  <tr><td colspan="4" class="titulo">BILL OF LADING<span class="original">ORIGINAL</span></td></tr>
+  <tr>
+    <td colspan="2"><div class="rot">Shipper</div><div class="valor">{{ bl.embarcador }}</div></td>
+    <td colspan="2"><div class="rot">B/L No.</div><div class="valor grande">{{ doc.numero }}</div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div class="rot">Consignee</div><div class="valor">{{ bl.consignatario }}</div></td>
+    <td colspan="2"><div class="rot">Carrier</div><div class="valor">{{ bl.armador }}</div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div class="rot">Notify party</div><div class="valor">{{ bl.notificar }}</div></td>
+    <td colspan="2"><div class="rot">Freight</div><div class="valor">{{ bl.frete }}</div></td>
+  </tr>
+  <tr>
+    <td><div class="rot">Vessel</div><div class="valor">{{ bl.navio }}</div></td>
+    <td><div class="rot">Voyage</div><div class="valor">{{ bl.viagem }}</div></td>
+    <td><div class="rot">Port of loading</div><div class="valor">{{ bl.porto_embarque }}</div></td>
+    <td><div class="rot">Port of discharge</div><div class="valor">{{ bl.porto_descarga }}</div></td>
+  </tr>
+</table>
+
+<table class="moldura cntr" style="margin-top: 4mm">
+  <thead>
+    <tr><th>Container No.</th><th>Seal No.</th><th>Packages</th><th>Description of goods</th><th class="num">Gross weight (kg)</th></tr>
+  </thead>
+  <tbody>
+    {% for c in bl.conteineres %}
+    <tr>
+      <td class="mono">{{ c.numero }}</td><td class="mono">{{ c.lacre }}</td>
+      <td>{{ c.volumes }} PKGS</td><td>{{ bl.mercadoria }}</td><td class="num">{{ c.peso_kg }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="moldura" style="margin-top: 4mm">
+  <tr>
+    <td><div class="rot">Place and date of issue</div><div class="valor">{{ bl.porto_embarque }}, {{ doc.emissao|data_en }}</div></td>
+    <td><div class="rot">Shipped on board</div><div class="valor">{{ bl.embarque|data_en }}</div></td>
+  </tr>
+</table>
+<p class="clausula">
+  Shipped in apparent good order and condition, said to contain the goods described above, for
+  carriage to the port of discharge subject to the terms of this bill of lading. One original
+  bill of lading must be surrendered duly endorsed in exchange for the goods. Fictitious sample
+  document.
+</p>
+{% endblock %}

@@ -29,3 +29,6 @@ coverage/
 # Testes E2E
 playwright-report/
 test-results/
+
+# Pré-visualizações de faturas (CF-32)
+data/preview/
