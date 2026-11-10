@@ -1,0 +1,3857 @@
+{
+  "components": {
+    "schemas": {
+      "ArquivoSaida": {
+        "properties": {
+          "tipo_arquivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Arquivo"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "tipo_arquivo"
+        ],
+        "title": "ArquivoSaida",
+        "type": "object"
+      },
+      "Body_enviar_documentos_documentos_post": {
+        "properties": {
+          "arquivos": {
+            "items": {
+              "contentMediaType": "application/octet-stream",
+              "type": "string"
+            },
+            "title": "Arquivos",
+            "type": "array"
+          },
+          "remetente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remetente"
+          }
+        },
+        "required": [
+          "arquivos"
+        ],
+        "title": "Body_enviar_documentos_documentos_post",
+        "type": "object"
+      },
+      "CasamentoSaida": {
+        "properties": {
+          "diferenca": {
+            "title": "Diferenca",
+            "type": "string"
+          },
+          "diferenca_brl": {
+            "title": "Diferenca Brl",
+            "type": "string"
+          },
+          "provisao": {
+            "$ref": "#/components/schemas/ProvisaoRef"
+          },
+          "ptax": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ptax"
+          },
+          "ptax_data": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ptax Data"
+          }
+        },
+        "required": [
+          "provisao",
+          "diferenca",
+          "diferenca_brl",
+          "ptax",
+          "ptax_data"
+        ],
+        "title": "CasamentoSaida",
+        "type": "object"
+      },
+      "DecisaoEntrada": {
+        "properties": {
+          "acao": {
+            "enum": [
+              "aprovar",
+              "contestar",
+              "corrigir_processo",
+              "corrigir_codigo",
+              "repassar",
+              "bloquear"
+            ],
+            "title": "Acao",
+            "type": "string"
+          },
+          "codigo_custo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Custo"
+          },
+          "comentario": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comentario"
+          },
+          "linha_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linha Id"
+          },
+          "processo_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Processo Id"
+          }
+        },
+        "required": [
+          "acao"
+        ],
+        "title": "DecisaoEntrada",
+        "type": "object"
+      },
+      "DecisaoPipeline": {
+        "properties": {
+          "motivos": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Motivos",
+            "type": "array"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "tau": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tau"
+          }
+        },
+        "required": [
+          "score",
+          "tau",
+          "motivos"
+        ],
+        "title": "DecisaoPipeline",
+        "type": "object"
+      },
+      "DecisaoSaida": {
+        "properties": {
+          "documento": {
+            "$ref": "#/components/schemas/DocumentoResumo"
+          },
+          "excecao": {
+            "$ref": "#/components/schemas/ExcecaoItem"
+          }
+        },
+        "required": [
+          "excecao",
+          "documento"
+        ],
+        "title": "DecisaoSaida",
+        "type": "object"
+      },
+      "DocumentoDaExcecao": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          }
+        },
+        "required": [
+          "id",
+          "numero",
+          "nome"
+        ],
+        "title": "DocumentoDaExcecao",
+        "type": "object"
+      },
+      "DocumentoDetalhe": {
+        "properties": {
+          "avisos": {
+            "items": {},
+            "title": "Avisos",
+            "type": "array"
+          },
+          "confianca": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confianca"
+          },
+          "criado_em": {
+            "format": "date-time",
+            "title": "Criado Em",
+            "type": "string"
+          },
+          "decisao": {
+            "$ref": "#/components/schemas/DecisaoPipeline"
+          },
+          "em_lote_demo": {
+            "title": "Em Lote Demo",
+            "type": "boolean"
+          },
+          "emissao": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Emissao"
+          },
+          "eventos": {
+            "items": {
+              "$ref": "#/components/schemas/EventoSaida"
+            },
+            "title": "Eventos",
+            "type": "array"
+          },
+          "excecoes": {
+            "items": {
+              "$ref": "#/components/schemas/ExcecaoDoDocumento"
+            },
+            "title": "Excecoes",
+            "type": "array"
+          },
+          "fornecedor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FornecedorRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "linhas": {
+            "items": {
+              "$ref": "#/components/schemas/LinhaSaida"
+            },
+            "title": "Linhas",
+            "type": "array"
+          },
+          "moeda": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moeda"
+          },
+          "nome_original": {
+            "title": "Nome Original",
+            "type": "string"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "remetente": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remetente"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tipo": {
+            "title": "Tipo",
+            "type": "string"
+          },
+          "tipo_arquivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Arquivo"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "vencimento": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vencimento"
+          }
+        },
+        "required": [
+          "id",
+          "nome_original",
+          "tipo",
+          "tipo_arquivo",
+          "remetente",
+          "fornecedor",
+          "numero",
+          "emissao",
+          "vencimento",
+          "moeda",
+          "total",
+          "status",
+          "confianca",
+          "em_lote_demo",
+          "criado_em",
+          "avisos",
+          "linhas",
+          "excecoes",
+          "eventos",
+          "decisao"
+        ],
+        "title": "DocumentoDetalhe",
+        "type": "object"
+      },
+      "DocumentoResumo": {
+        "properties": {
+          "criado_em": {
+            "format": "date-time",
+            "title": "Criado Em",
+            "type": "string"
+          },
+          "fornecedor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FornecedorRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "moeda": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moeda"
+          },
+          "n_excecoes": {
+            "title": "N Excecoes",
+            "type": "integer"
+          },
+          "nome_original": {
+            "title": "Nome Original",
+            "type": "string"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "processos": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Processos",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tipo": {
+            "title": "Tipo",
+            "type": "string"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "valor_brl_em_risco": {
+            "title": "Valor Brl Em Risco",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome_original",
+          "tipo",
+          "fornecedor",
+          "numero",
+          "total",
+          "moeda",
+          "status",
+          "valor_brl_em_risco",
+          "n_excecoes",
+          "processos",
+          "criado_em"
+        ],
+        "title": "DocumentoResumo",
+        "type": "object"
+      },
+      "EmpresaSaida": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ],
+        "title": "EmpresaSaida",
+        "type": "object"
+      },
+      "EuSaida": {
+        "properties": {
+          "empresa": {
+            "$ref": "#/components/schemas/EmpresaSaida"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/UsuarioSaida"
+          }
+        },
+        "required": [
+          "usuario",
+          "empresa"
+        ],
+        "title": "EuSaida",
+        "type": "object"
+      },
+      "EventoSaida": {
+        "properties": {
+          "criado_em": {
+            "format": "date-time",
+            "title": "Criado Em",
+            "type": "string"
+          },
+          "dados": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dados"
+          },
+          "etapa": {
+            "title": "Etapa",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "mensagem": {
+            "title": "Mensagem",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "etapa",
+          "status",
+          "mensagem",
+          "dados",
+          "criado_em"
+        ],
+        "title": "EventoSaida",
+        "type": "object"
+      },
+      "ExcecaoDoDocumento": {
+        "properties": {
+          "acao_sugerida": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acao Sugerida"
+          },
+          "criado_em": {
+            "format": "date-time",
+            "title": "Criado Em",
+            "type": "string"
+          },
+          "dados": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dados"
+          },
+          "explicacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explicacao"
+          },
+          "explicacao_origem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explicacao Origem"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "linha_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Linha Id"
+          },
+          "resolvida_em": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolvida Em"
+          },
+          "severidade": {
+            "title": "Severidade",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tipo": {
+            "title": "Tipo",
+            "type": "string"
+          },
+          "valor_brl_em_risco": {
+            "title": "Valor Brl Em Risco",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tipo",
+          "severidade",
+          "linha_id",
+          "valor_brl_em_risco",
+          "explicacao",
+          "explicacao_origem",
+          "acao_sugerida",
+          "status",
+          "dados",
+          "criado_em",
+          "resolvida_em"
+        ],
+        "title": "ExcecaoDoDocumento",
+        "type": "object"
+      },
+      "ExcecaoItem": {
+        "properties": {
+          "acao_sugerida": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Acao Sugerida"
+          },
+          "criado_em": {
+            "format": "date-time",
+            "title": "Criado Em",
+            "type": "string"
+          },
+          "documento": {
+            "$ref": "#/components/schemas/DocumentoDaExcecao"
+          },
+          "explicacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explicacao"
+          },
+          "fornecedor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FornecedorNome"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "linha": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LinhaDaExcecao"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "processo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProcessoCodigo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "severidade": {
+            "title": "Severidade",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tipo": {
+            "title": "Tipo",
+            "type": "string"
+          },
+          "valor_brl_em_risco": {
+            "title": "Valor Brl Em Risco",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tipo",
+          "severidade",
+          "status",
+          "documento",
+          "fornecedor",
+          "processo",
+          "linha",
+          "valor_brl_em_risco",
+          "explicacao",
+          "acao_sugerida",
+          "criado_em"
+        ],
+        "title": "ExcecaoItem",
+        "type": "object"
+      },
+      "FornecedorNome": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ],
+        "title": "FornecedorNome",
+        "type": "object"
+      },
+      "FornecedorRanking": {
+        "properties": {
+          "fornecedor_id": {
+            "format": "uuid",
+            "title": "Fornecedor Id",
+            "type": "string"
+          },
+          "n_documentos": {
+            "title": "N Documentos",
+            "type": "integer"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          },
+          "pct_com_excecao": {
+            "title": "Pct Com Excecao",
+            "type": "number"
+          },
+          "rs_em_risco": {
+            "title": "Rs Em Risco",
+            "type": "string"
+          },
+          "rs_evitado": {
+            "title": "Rs Evitado",
+            "type": "string"
+          },
+          "tipo_mais_comum": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo Mais Comum"
+          }
+        },
+        "required": [
+          "fornecedor_id",
+          "nome",
+          "n_documentos",
+          "pct_com_excecao",
+          "rs_em_risco",
+          "rs_evitado",
+          "tipo_mais_comum"
+        ],
+        "title": "FornecedorRanking",
+        "type": "object"
+      },
+      "FornecedorRef": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome"
+        ],
+        "title": "FornecedorRef",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ItemPrevistoCobrado": {
+        "properties": {
+          "cobrado_brl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cobrado Brl"
+          },
+          "cobrado_moeda": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cobrado Moeda"
+          },
+          "cobrado_valor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cobrado Valor"
+          },
+          "codigo_custo": {
+            "title": "Codigo Custo",
+            "type": "string"
+          },
+          "diferenca_brl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diferenca Brl"
+          },
+          "documento_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Documento Ids",
+            "type": "array"
+          },
+          "estado": {
+            "enum": [
+              "ok",
+              "acima",
+              "abaixo",
+              "sem_fatura",
+              "sem_provisao"
+            ],
+            "title": "Estado",
+            "type": "string"
+          },
+          "fornecedor": {
+            "$ref": "#/components/schemas/FornecedorRef"
+          },
+          "linha_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Linha Ids",
+            "type": "array"
+          },
+          "previsto_brl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previsto Brl"
+          },
+          "previsto_moeda": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previsto Moeda"
+          },
+          "previsto_valor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previsto Valor"
+          }
+        },
+        "required": [
+          "fornecedor",
+          "codigo_custo",
+          "previsto_moeda",
+          "previsto_valor",
+          "previsto_brl",
+          "cobrado_moeda",
+          "cobrado_valor",
+          "cobrado_brl",
+          "diferenca_brl",
+          "estado",
+          "documento_ids",
+          "linha_ids"
+        ],
+        "title": "ItemPrevistoCobrado",
+        "type": "object"
+      },
+      "ItemUpload": {
+        "properties": {
+          "aviso": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aviso"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "status",
+          "aviso"
+        ],
+        "title": "ItemUpload",
+        "type": "object"
+      },
+      "KpiContagem": {
+        "properties": {
+          "baseline": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "valor",
+          "baseline"
+        ],
+        "title": "KpiContagem",
+        "type": "object"
+      },
+      "KpiDinheiro": {
+        "properties": {
+          "baseline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          }
+        },
+        "required": [
+          "valor",
+          "baseline"
+        ],
+        "title": "KpiDinheiro",
+        "type": "object"
+      },
+      "KpiPercentual": {
+        "properties": {
+          "baseline": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "number"
+          }
+        },
+        "required": [
+          "valor",
+          "baseline"
+        ],
+        "title": "KpiPercentual",
+        "type": "object"
+      },
+      "KpiSegundos": {
+        "properties": {
+          "baseline": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "required": [
+          "valor",
+          "baseline"
+        ],
+        "title": "KpiSegundos",
+        "type": "object"
+      },
+      "KpiUsd": {
+        "properties": {
+          "baseline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          }
+        },
+        "required": [
+          "valor",
+          "baseline"
+        ],
+        "title": "KpiUsd",
+        "type": "object"
+      },
+      "Kpis": {
+        "properties": {
+          "custo_ia_por_fatura_usd": {
+            "$ref": "#/components/schemas/KpiUsd"
+          },
+          "n_documentos": {
+            "$ref": "#/components/schemas/KpiContagem"
+          },
+          "pct_sem_toque": {
+            "$ref": "#/components/schemas/KpiPercentual"
+          },
+          "rs_evitado": {
+            "$ref": "#/components/schemas/KpiDinheiro"
+          },
+          "tempo_mediano_s": {
+            "$ref": "#/components/schemas/KpiSegundos"
+          },
+          "tempo_p95_s": {
+            "$ref": "#/components/schemas/KpiSegundos"
+          }
+        },
+        "required": [
+          "rs_evitado",
+          "pct_sem_toque",
+          "tempo_mediano_s",
+          "tempo_p95_s",
+          "n_documentos",
+          "custo_ia_por_fatura_usd"
+        ],
+        "title": "Kpis",
+        "type": "object"
+      },
+      "LinhaDaExcecao": {
+        "properties": {
+          "descricao": {
+            "title": "Descricao",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "moeda": {
+            "title": "Moeda",
+            "type": "string"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "descricao",
+          "valor",
+          "moeda"
+        ],
+        "title": "LinhaDaExcecao",
+        "type": "object"
+      },
+      "LinhaSaida": {
+        "properties": {
+          "bbox": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bbox"
+          },
+          "casamento": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CasamentoSaida"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "codigo_custo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Custo"
+          },
+          "conf_codigo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conf Codigo"
+          },
+          "conf_extracao": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conf Extracao"
+          },
+          "conf_processo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conf Processo"
+          },
+          "descricao": {
+            "title": "Descricao",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "metodo_codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metodo Codigo"
+          },
+          "moeda": {
+            "title": "Moeda",
+            "type": "string"
+          },
+          "ordem": {
+            "title": "Ordem",
+            "type": "integer"
+          },
+          "processo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProcessoRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "qtd": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qtd"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          },
+          "valor_brl": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Brl"
+          },
+          "valor_unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Unit"
+          }
+        },
+        "required": [
+          "id",
+          "ordem",
+          "descricao",
+          "qtd",
+          "valor_unit",
+          "valor",
+          "moeda",
+          "valor_brl",
+          "processo",
+          "codigo_custo",
+          "conf_extracao",
+          "conf_processo",
+          "conf_codigo",
+          "metodo_codigo",
+          "estado",
+          "bbox",
+          "casamento"
+        ],
+        "title": "LinhaSaida",
+        "type": "object"
+      },
+      "ListaExcecoesSaida": {
+        "properties": {
+          "facetas": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Facetas",
+            "type": "object"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ExcecaoItem"
+            },
+            "title": "Itens",
+            "type": "array"
+          }
+        },
+        "required": [
+          "itens",
+          "facetas"
+        ],
+        "title": "ListaExcecoesSaida",
+        "type": "object"
+      },
+      "PaginaDocumentos": {
+        "properties": {
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentoResumo"
+            },
+            "title": "Itens",
+            "type": "array"
+          },
+          "proximo_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proximo Cursor"
+          }
+        },
+        "required": [
+          "itens",
+          "proximo_cursor"
+        ],
+        "title": "PaginaDocumentos",
+        "type": "object"
+      },
+      "PainelSaida": {
+        "properties": {
+          "kpis": {
+            "$ref": "#/components/schemas/Kpis"
+          },
+          "por_tipo_excecao": {
+            "items": {
+              "$ref": "#/components/schemas/TipoExcecaoPainel"
+            },
+            "title": "Por Tipo Excecao",
+            "type": "array"
+          },
+          "ranking_fornecedores": {
+            "items": {
+              "$ref": "#/components/schemas/FornecedorRanking"
+            },
+            "title": "Ranking Fornecedores",
+            "type": "array"
+          },
+          "serie_temporal": {
+            "items": {
+              "$ref": "#/components/schemas/PontoSerie"
+            },
+            "title": "Serie Temporal",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kpis",
+          "serie_temporal",
+          "ranking_fornecedores",
+          "por_tipo_excecao"
+        ],
+        "title": "PainelSaida",
+        "type": "object"
+      },
+      "PontoSerie": {
+        "properties": {
+          "documentos": {
+            "title": "Documentos",
+            "type": "integer"
+          },
+          "instante": {
+            "format": "date-time",
+            "title": "Instante",
+            "type": "string"
+          },
+          "rs_evitado": {
+            "title": "Rs Evitado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "instante",
+          "documentos",
+          "rs_evitado"
+        ],
+        "title": "PontoSerie",
+        "type": "object"
+      },
+      "ProcessoCodigo": {
+        "properties": {
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "codigo"
+        ],
+        "title": "ProcessoCodigo",
+        "type": "object"
+      },
+      "ProcessoDetalhe": {
+        "properties": {
+          "bls": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Bls",
+            "type": "array"
+          },
+          "cliente": {
+            "title": "Cliente",
+            "type": "string"
+          },
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "conteineres": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Conteineres",
+            "type": "array"
+          },
+          "destino": {
+            "title": "Destino",
+            "type": "string"
+          },
+          "eta": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta"
+          },
+          "etd": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etd"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ItemPrevistoCobrado"
+            },
+            "title": "Itens",
+            "type": "array"
+          },
+          "modal": {
+            "title": "Modal",
+            "type": "string"
+          },
+          "navio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Navio"
+          },
+          "origem": {
+            "title": "Origem",
+            "type": "string"
+          },
+          "referencias_cliente": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Referencias Cliente",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "totais": {
+            "$ref": "#/components/schemas/TotaisProcesso"
+          },
+          "viagem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Viagem"
+          }
+        },
+        "required": [
+          "id",
+          "codigo",
+          "cliente",
+          "modal",
+          "origem",
+          "destino",
+          "navio",
+          "viagem",
+          "etd",
+          "eta",
+          "status",
+          "conteineres",
+          "bls",
+          "referencias_cliente",
+          "itens",
+          "totais"
+        ],
+        "title": "ProcessoDetalhe",
+        "type": "object"
+      },
+      "ProcessoRef": {
+        "properties": {
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "codigo"
+        ],
+        "title": "ProcessoRef",
+        "type": "object"
+      },
+      "ProcessoResumo": {
+        "properties": {
+          "cliente": {
+            "title": "Cliente",
+            "type": "string"
+          },
+          "codigo": {
+            "title": "Codigo",
+            "type": "string"
+          },
+          "cotacao_incompleta": {
+            "title": "Cotacao Incompleta",
+            "type": "boolean"
+          },
+          "destino": {
+            "title": "Destino",
+            "type": "string"
+          },
+          "eta": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eta"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "n_documentos": {
+            "title": "N Documentos",
+            "type": "integer"
+          },
+          "n_excecoes_abertas": {
+            "title": "N Excecoes Abertas",
+            "type": "integer"
+          },
+          "navio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Navio"
+          },
+          "origem": {
+            "title": "Origem",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_cobrado_brl": {
+            "title": "Total Cobrado Brl",
+            "type": "string"
+          },
+          "total_previsto_brl": {
+            "title": "Total Previsto Brl",
+            "type": "string"
+          },
+          "viagem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Viagem"
+          }
+        },
+        "required": [
+          "id",
+          "codigo",
+          "cliente",
+          "origem",
+          "destino",
+          "navio",
+          "viagem",
+          "eta",
+          "status",
+          "n_documentos",
+          "total_previsto_brl",
+          "total_cobrado_brl",
+          "n_excecoes_abertas",
+          "cotacao_incompleta"
+        ],
+        "title": "ProcessoResumo",
+        "type": "object"
+      },
+      "ProvisaoEdicao": {
+        "properties": {
+          "codigo_custo": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Custo"
+          },
+          "moeda": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z]{3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moeda"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "aberta",
+                  "cancelada"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "title": "ProvisaoEdicao",
+        "type": "object"
+      },
+      "ProvisaoEntrada": {
+        "properties": {
+          "codigo_custo": {
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Codigo Custo",
+            "type": "string"
+          },
+          "fornecedor_id": {
+            "format": "uuid",
+            "title": "Fornecedor Id",
+            "type": "string"
+          },
+          "moeda": {
+            "pattern": "^[A-Z]{3}$",
+            "title": "Moeda",
+            "type": "string"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "required": [
+          "fornecedor_id",
+          "codigo_custo",
+          "moeda",
+          "valor"
+        ],
+        "title": "ProvisaoEntrada",
+        "type": "object"
+      },
+      "ProvisaoRef": {
+        "properties": {
+          "codigo_custo": {
+            "title": "Codigo Custo",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "moeda": {
+            "title": "Moeda",
+            "type": "string"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "codigo_custo",
+          "valor",
+          "moeda"
+        ],
+        "title": "ProvisaoRef",
+        "type": "object"
+      },
+      "ProvisaoSaida": {
+        "properties": {
+          "codigo_custo": {
+            "title": "Codigo Custo",
+            "type": "string"
+          },
+          "documentos_reprocessados": {
+            "default": 0,
+            "title": "Documentos Reprocessados",
+            "type": "integer"
+          },
+          "fornecedor": {
+            "$ref": "#/components/schemas/FornecedorRef"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "moeda": {
+            "title": "Moeda",
+            "type": "string"
+          },
+          "processo_id": {
+            "format": "uuid",
+            "title": "Processo Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "valor": {
+            "title": "Valor",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "processo_id",
+          "fornecedor",
+          "codigo_custo",
+          "moeda",
+          "valor",
+          "status"
+        ],
+        "title": "ProvisaoSaida",
+        "type": "object"
+      },
+      "TipoExcecaoPainel": {
+        "properties": {
+          "quantidade": {
+            "title": "Quantidade",
+            "type": "integer"
+          },
+          "rs": {
+            "title": "Rs",
+            "type": "string"
+          },
+          "tipo": {
+            "title": "Tipo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "quantidade",
+          "rs"
+        ],
+        "title": "TipoExcecaoPainel",
+        "type": "object"
+      },
+      "TotaisProcesso": {
+        "properties": {
+          "cobrado_brl": {
+            "title": "Cobrado Brl",
+            "type": "string"
+          },
+          "cotacao_incompleta": {
+            "title": "Cotacao Incompleta",
+            "type": "boolean"
+          },
+          "diferenca_brl": {
+            "title": "Diferenca Brl",
+            "type": "string"
+          },
+          "previsto_brl": {
+            "title": "Previsto Brl",
+            "type": "string"
+          },
+          "saldo_a_repassar_brl": {
+            "title": "Saldo A Repassar Brl",
+            "type": "string"
+          }
+        },
+        "required": [
+          "previsto_brl",
+          "cobrado_brl",
+          "diferenca_brl",
+          "saldo_a_repassar_brl",
+          "cotacao_incompleta"
+        ],
+        "title": "TotaisProcesso",
+        "type": "object"
+      },
+      "UploadSaida": {
+        "properties": {
+          "documentos": {
+            "items": {
+              "$ref": "#/components/schemas/ItemUpload"
+            },
+            "title": "Documentos",
+            "type": "array"
+          }
+        },
+        "required": [
+          "documentos"
+        ],
+        "title": "UploadSaida",
+        "type": "object"
+      },
+      "UsuarioSaida": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nome": {
+            "title": "Nome",
+            "type": "string"
+          },
+          "papel": {
+            "title": "Papel",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nome",
+          "email",
+          "papel"
+        ],
+        "title": "UsuarioSaida",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Confere API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/arquivos-locais/{caminho}": {
+      "get": {
+        "operationId": "arquivo_local_arquivos_locais__caminho__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "caminho",
+            "required": true,
+            "schema": {
+              "title": "Caminho",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exp",
+            "required": true,
+            "schema": {
+              "title": "Exp",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sig",
+            "required": true,
+            "schema": {
+              "title": "Sig",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Arquivo Local",
+        "tags": [
+          "arquivos"
+        ]
+      }
+    },
+    "/auth/demo": {
+      "post": {
+        "description": "Cria a sessão do usuário demo. Só existe com `DEMO_MODE=true` ou `ENV=local`.",
+        "operationId": "entrar_na_demo_auth_demo_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EuSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Entrar Na Demo",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/eu": {
+      "get": {
+        "operationId": "quem_sou_eu_auth_eu_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EuSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Quem Sou Eu",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/sair": {
+      "post": {
+        "operationId": "sair_auth_sair_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Sair",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/demo/lote": {
+      "post": {
+        "description": "Envia os 40 arquivos de `data/seed42/demo_lote.json` pelo caminho do upload.\n\nDepende da função de serviço do `POST /documentos` (CF-105) e do arquivo `demo_lote.json`\n(comando `lote-demo` do synth), que ainda não existem. Ver `docs/pendencias.md`.",
+        "operationId": "enviar_lote_demo_demo_lote_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Enviar Lote Demo Demo Lote Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Enviar Lote Demo",
+        "tags": [
+          "demo"
+        ]
+      }
+    },
+    "/demo/reset": {
+      "post": {
+        "description": "Apaga os dados transacionais da empresa demo. Os arquivos ficam (reuso por sha256).",
+        "operationId": "resetar_demo_demo_reset_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limpar_arquivos",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Limpar Arquivos",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Resetar Demo Demo Reset Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resetar Demo",
+        "tags": [
+          "demo"
+        ]
+      }
+    },
+    "/documentos": {
+      "get": {
+        "operationId": "listar_documentos_documentos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fornecedor_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fornecedor Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "processo_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Processo Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "em_lote_demo",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Em Lote Demo"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginaDocumentos"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Documentos",
+        "tags": [
+          "documentos"
+        ]
+      },
+      "post": {
+        "description": "Recebe até 50 arquivos de 15 MB. Um arquivo ruim não derruba os outros.",
+        "operationId": "enviar_documentos_documentos_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_enviar_documentos_documentos_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Enviar Documentos",
+        "tags": [
+          "documentos"
+        ]
+      }
+    },
+    "/documentos/{documento_id}": {
+      "get": {
+        "operationId": "obter_documento_documentos__documento_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "documento_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Documento Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentoDetalhe"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obter Documento",
+        "tags": [
+          "documentos"
+        ]
+      }
+    },
+    "/documentos/{documento_id}/arquivo": {
+      "get": {
+        "description": "URL assinada (300 s) do arquivo. No backend local aponta para `/arquivos-locais/...`.",
+        "operationId": "obter_arquivo_documentos__documento_id__arquivo_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "documento_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Documento Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArquivoSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obter Arquivo",
+        "tags": [
+          "documentos"
+        ]
+      }
+    },
+    "/excecoes": {
+      "get": {
+        "operationId": "listar_excecoes_excecoes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "tipo",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "aberta",
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "fornecedor_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fornecedor Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ordenar",
+            "required": false,
+            "schema": {
+              "default": "risco",
+              "enum": [
+                "risco",
+                "recentes"
+              ],
+              "title": "Ordenar",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaExcecoesSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Excecoes",
+        "tags": [
+          "excecoes"
+        ]
+      }
+    },
+    "/excecoes/{excecao_id}/decisao": {
+      "post": {
+        "operationId": "decidir_excecao_excecoes__excecao_id__decisao_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "excecao_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Excecao Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisaoEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisaoSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decidir Excecao",
+        "tags": [
+          "excecoes"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "sistema"
+        ]
+      }
+    },
+    "/painel": {
+      "get": {
+        "operationId": "obter_painel_painel_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "de",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "De"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ate"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lote",
+            "required": false,
+            "schema": {
+              "default": "todos",
+              "enum": [
+                "demo",
+                "todos"
+              ],
+              "title": "Lote",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PainelSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obter Painel",
+        "tags": [
+          "painel"
+        ]
+      }
+    },
+    "/processos": {
+      "get": {
+        "operationId": "listar_processos_processos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "busca",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Busca"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProcessoResumo"
+                  },
+                  "title": "Response Listar Processos Processos Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Processos",
+        "tags": [
+          "processos"
+        ]
+      }
+    },
+    "/processos/{processo_id}": {
+      "get": {
+        "operationId": "obter_processo_processos__processo_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "processo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Processo Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessoDetalhe"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obter Processo",
+        "tags": [
+          "processos"
+        ]
+      }
+    },
+    "/processos/{processo_id}/provisoes": {
+      "post": {
+        "operationId": "criar_provisao_processos__processo_id__provisoes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "processo_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Processo Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProvisaoEntrada"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProvisaoSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Criar Provisao",
+        "tags": [
+          "processos"
+        ]
+      }
+    },
+    "/provisoes/{provisao_id}": {
+      "patch": {
+        "operationId": "editar_provisao_provisoes__provisao_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provisao_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Provisao Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProvisaoEdicao"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProvisaoSaida"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Editar Provisao",
+        "tags": [
+          "processos"
+        ]
+      }
+    },
+    "/stream": {
+      "get": {
+        "description": "Eventos do pipeline: `id > desde` (ou `Last-Event-ID`); sem nenhum, só os novos.",
+        "operationId": "stream_stream_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "in": "header",
+            "name": "last-event-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-empresa-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Empresa-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-papel",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Papel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stream",
+        "tags": [
+          "stream"
+        ]
+      }
+    }
+  }
+}

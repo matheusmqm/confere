@@ -98,6 +98,17 @@ jobs:
           cache-dependency-path: apps/web/pnpm-lock.yaml
 
       - run: pnpm -C apps/web install --frozen-lockfile
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --all-packages
+      - name: Contrato da API (quebra se o schema mudou sem regenerar o cliente)
+        run: |
+          make gen-api
+          git diff --exit-code -- apps/api/openapi.json apps/web/src/lib/api/schema.d.ts
+
       - run: pnpm -C apps/web lint
       - run: pnpm -C apps/web typecheck
       - run: pnpm -C apps/web test

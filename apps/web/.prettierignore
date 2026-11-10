@@ -5,3 +5,6 @@ playwright-report
 test-results
 coverage
 next-env.d.ts
+
+# gerado por `make gen-api` (openapi-typescript): não reformatar
+src/lib/api/schema.d.ts
