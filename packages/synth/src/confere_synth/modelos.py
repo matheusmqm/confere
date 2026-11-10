@@ -5,7 +5,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 TipoFornecedor = Literal[
     "armador", "agente_exterior", "terminal", "armazem", "transportadora", "despachante"
@@ -89,13 +89,29 @@ class Processo(_Modelo):
 
 
 class Provisao(_Modelo):
-    id: str
-    processo_id: str
+    id: uuid.UUID
+    processo_id: uuid.UUID
     fornecedor_id: str
     codigo_custo: str
     moeda: str = Field(pattern=PADRAO_MOEDA)
-    valor: Decimal
+    valor: Decimal = Field(gt=0)
     status: StatusProvisao = "aberta"
+
+
+class Emitente(_Modelo):
+    """Dados do fornecedor impressos no documento (tudo fictício)."""
+
+    nome: str
+    endereco: str
+    cnpj: str | None = None
+    email: str
+
+    @field_validator("email")
+    @classmethod
+    def _dominio_example(cls, email: str) -> str:
+        if not email.endswith(".example"):
+            raise ValueError(f"e-mail deve terminar em .example: {email!r}")
+        return email
 
 
 class LinhaSintetica(_Modelo):
@@ -104,24 +120,45 @@ class LinhaSintetica(_Modelo):
     valor_unit: Decimal
     valor: Decimal
     moeda: str = Field(pattern=PADRAO_MOEDA)
-    codigo_custo: str  # gabarito: o código correto desta cobrança
-    provisao_id: str | None = None  # gabarito: provisão a que a linha corresponde
-    referencias: list[Referencia] = Field(default_factory=list)
+    # gabarito: a que processo, provisão e código de custo a cobrança corresponde
+    codigo_custo: str
+    processo_id: uuid.UUID | None = None
+    provisao_id: uuid.UUID | None = None
+    referencias: list[Referencia] = Field(default_factory=list)  # referências desta linha
+    # campos que só alguns estilos de fatura imprimem
+    codigo_fornecedor: str | None = None  # código interno do fornecedor (estilo 3)
+    secao: Literal["reembolso", "honorario"] | None = None  # estilo 5
+    periodo: tuple[date, date] | None = None  # estilo 4: entrada e saída
+    base_cif: Decimal | None = None  # estilo 4
+    percentual: Decimal | None = None  # estilo 4
+    fatura_no: str | None = None  # estilo 6 (extrato): fatura a que a linha pertence
+    # fatura em BRL de valor previsto em moeda estrangeira (fornecedor nacional que converte)
+    moeda_origem: str | None = None
+    valor_origem: Decimal | None = None
+    taxa_cambio: Decimal | None = None  # BRL por unidade de `moeda_origem`, 4 casas
+    informativa: bool = False  # linha sem cobrança (ex. "Taxa de câmbio aplicada"), valor 0
+    bl: str | None = None  # estilo 6
+    container: str | None = None  # estilo 6
 
 
 class ErroInjetado(_Modelo):
+    """Um erro injetado (CF-36). `linha_ordem` é 1-indexado; None = erro do documento todo."""
+
+    doc_id: uuid.UUID
+    linha_ordem: int | None = None
     tipo: TipoErro
-    documento_id: str
-    linha_indice: int | None = None
-    detalhe: str = ""
-    impacto_brl: Decimal | None = None
+    valor_erro_moeda: Decimal | None = None  # None quando o erro não tem valor (referência cruzada)
+    moeda: str = Field(pattern=PADRAO_MOEDA)
+    valor_erro_brl: Decimal | None = None  # None sem PTAX disponível (ex. CNY, data sem cotação)
+    descricao: str
 
 
 class DocumentoSintetico(_Modelo):
-    id: str
+    id: uuid.UUID
     tipo: TipoDocumento
     fornecedor_id: str
-    processo_id: str | None = None
+    emitente: Emitente
+    processo_id: uuid.UUID | None = None  # None quando junta mais de um processo
     numero: str
     emissao: date
     vencimento: date | None = None
@@ -131,7 +168,18 @@ class DocumentoSintetico(_Modelo):
     formato: Literal["pdf", "xml"] = "pdf"
     estilo_id: int = Field(ge=1, le=6)
     erros: list[ErroInjetado] = Field(default_factory=list)
-    arquivo: str | None = None
+    arquivo: str | None = None  # relativo à pasta de saída, ex. documentos/<id>.pdf
+    sha256: str | None = None  # do arquivo renderizado
+    chave_acesso: str | None = None  # CT-e: chave de 44 dígitos
+    duplicata_de: uuid.UUID | None = None  # id do documento original (erro "duplicada")
+    duplicata_identica: bool = False  # True: o PDF é cópia byte a byte do original
+    ruido: bool = False  # True se `arquivo` é a versão "foto de celular" (CF-37)
+    arquivo_original: str | None = None  # a versão limpa, quando há ruído
+    # o que o fornecedor cita do processo (documentos de um processo só)
+    referencias: list[Referencia] = Field(default_factory=list)
+    navio: str | None = None
+    viagem: str | None = None
+    observacoes: str = ""
 
 
 class Mundo(_Modelo):

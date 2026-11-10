@@ -1,0 +1,103 @@
+# Custos típicos FICTÍCIOS (porém plausíveis) por código de custo, usados só para gerar
+# provisões sintéticas (CF-31). Nada aqui é tabela real de preços.
+#
+# Campos de cada código:
+#   tipo_fornecedor  tipos de fornecedor que podem cobrar o código (lista)
+#   moeda            moeda da provisão
+#   base             valor unitário; nos códigos com `percentual_de`, é o percentual (8 = 8%)
+#   unidade          igual ao catálogo (config/codigos_custo.yaml)
+#   ruido_rel        desvio-padrão relativo do ruído gaussiano aplicado ao valor
+#   prob             probabilidade de o processo ter a provisão (1.0 = sempre, se aplicável)
+#   percentual_de    `cif` ou outro código de custo cujo valor é a base do percentual
+#   minimo           piso do valor calculado por percentual (antes do ruído)
+#   dias             faixa sorteada de dias para códigos por_dia (valor = base x contêineres x dias)
+#
+# Quantidade: por_conteiner = nº de contêineres; por_bl = nº de BLs house; por_processo = 1.
+versao: 1
+
+# BRL por unidade de moeda estrangeira. Fictício: só converte bases percentuais entre moedas.
+cambio_referencia: {BRL: 1.00, USD: 5.40, EUR: 6.30, CNY: 0.75}
+
+# Valor CIF fictício de um processo = nº de contêineres x sorteio uniforme nesta faixa (BRL).
+cif_por_conteiner_brl: [180000, 420000]
+
+codigos:
+  # ---------------------------------------------------------------- frete
+  FRETE_MAR:
+    {tipo_fornecedor: [armador], moeda: USD, base: 1800, unidade: por_conteiner, ruido_rel: 0.10, prob: 1.0}
+  BAF:
+    {tipo_fornecedor: [armador], moeda: USD, base: 220, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.85}
+  CAF:
+    {tipo_fornecedor: [armador], moeda: USD, base: 5, unidade: percentual, ruido_rel: 0.05, prob: 0.30, percentual_de: FRETE_MAR}
+  PSS:
+    {tipo_fornecedor: [armador], moeda: USD, base: 400, unidade: por_conteiner, ruido_rel: 0.12, prob: 0.25}
+
+  # --------------------------------------------------------------- origem
+  THC_ORIG:
+    {tipo_fornecedor: [armador, agente_exterior], moeda: USD, base: 180, unidade: por_conteiner, ruido_rel: 0.08, prob: 0.90}
+
+  # -------------------------------------------------------------- destino
+  THC_DEST:
+    {tipo_fornecedor: [terminal], moeda: BRL, base: 1350, unidade: por_conteiner, ruido_rel: 0.08, prob: 1.0}
+  DESCONSOLIDACAO:
+    {tipo_fornecedor: [armazem], moeda: BRL, base: 420, unidade: por_bl, ruido_rel: 0.10, prob: 0.35}
+  LIBERACAO_BL:
+    {tipo_fornecedor: [armador, agente_exterior], moeda: BRL, base: 280, unidade: por_bl, ruido_rel: 0.08, prob: 0.55}
+  ISPS:
+    {tipo_fornecedor: [armador, terminal], moeda: BRL, base: 55, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.60}
+  SCANNER:
+    {tipo_fornecedor: [terminal, armazem], moeda: BRL, base: 190, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.30}
+
+  # ---------------------------------------------------------- armazenagem
+  # Armazenagem: 0,35% do CIF no 1º período, com mínimo de R$ 950 (quantidade 1).
+  ARMAZENAGEM:
+    {tipo_fornecedor: [armazem, terminal], moeda: BRL, base: 0.35, unidade: por_dia, ruido_rel: 0.15, prob: 0.75, percentual_de: cif, minimo: 950}
+  POSICIONAMENTO:
+    {tipo_fornecedor: [terminal, armazem], moeda: BRL, base: 380, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.40}
+  LEVANTE:
+    {tipo_fornecedor: [terminal, armazem], moeda: BRL, base: 250, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.50}
+  DEMURRAGE:
+    {tipo_fornecedor: [armador], moeda: USD, base: 95, unidade: por_dia, ruido_rel: 0.15, prob: 0.10, dias: [3, 10]}
+  DETENTION:
+    {tipo_fornecedor: [armador], moeda: USD, base: 60, unidade: por_dia, ruido_rel: 0.15, prob: 0.10, dias: [2, 8]}
+  LAVAGEM_CNTR:
+    {tipo_fornecedor: [armazem, terminal], moeda: BRL, base: 160, unidade: por_conteiner, ruido_rel: 0.10, prob: 0.12}
+
+  # -------------------------------------------------------------- governo
+  # AFRMM: 8% do frete marítimo, em reais.
+  AFRMM:
+    {tipo_fornecedor: [despachante], moeda: BRL, base: 8, unidade: percentual, ruido_rel: 0.02, prob: 0.85, percentual_de: FRETE_MAR}
+  SISCOMEX:
+    {tipo_fornecedor: [despachante], moeda: BRL, base: 154.23, unidade: por_processo, ruido_rel: 0.0, prob: 1.0}
+
+  # --------------------------------------------------------- documentacao
+  BL_FEE:
+    {tipo_fornecedor: [armador, agente_exterior], moeda: USD, base: 75, unidade: por_bl, ruido_rel: 0.05, prob: 0.90}
+  DOC_FEE_ORIG:
+    {tipo_fornecedor: [armador, agente_exterior], moeda: USD, base: 60, unidade: por_bl, ruido_rel: 0.08, prob: 0.60}
+  CORRECAO_BL:
+    {tipo_fornecedor: [armador, agente_exterior], moeda: USD, base: 90, unidade: por_bl, ruido_rel: 0.10, prob: 0.08}
+
+  # ----------------------------------------------------------- rodoviario
+  FRETE_RODO:
+    {tipo_fornecedor: [transportadora], moeda: BRL, base: 2900, unidade: por_processo, ruido_rel: 0.12, prob: 1.0}
+  PEDAGIO:
+    {tipo_fornecedor: [transportadora], moeda: BRL, base: 310, unidade: por_processo, ruido_rel: 0.15, prob: 0.70}
+  GRIS:
+    {tipo_fornecedor: [transportadora], moeda: BRL, base: 0.30, unidade: percentual, ruido_rel: 0.10, prob: 0.60, percentual_de: cif, minimo: 120}
+  AD_VALOREM_SEGURO:
+    {tipo_fornecedor: [transportadora], moeda: BRL, base: 0.12, unidade: percentual, ruido_rel: 0.10, prob: 0.55, percentual_de: cif, minimo: 150}
+
+  # ------------------------------------------------------------- despacho
+  HONORARIO_DESPACHO:
+    {tipo_fornecedor: [despachante], moeda: BRL, base: 850, unidade: por_processo, ruido_rel: 0.08, prob: 1.0}
+  SDA:
+    {tipo_fornecedor: [despachante], moeda: BRL, base: 95, unidade: por_processo, ruido_rel: 0.05, prob: 0.60}
+  EMISSAO_LI:
+    {tipo_fornecedor: [despachante], moeda: BRL, base: 185, unidade: por_processo, ruido_rel: 0.05, prob: 0.35}
+
+  # --------------------------------------------------------------- outros
+  COURIER:
+    {tipo_fornecedor: [agente_exterior, despachante], moeda: BRL, base: 90, unidade: por_processo, ruido_rel: 0.15, prob: 0.40}
+  HANDLING_AGENTE:
+    {tipo_fornecedor: [agente_exterior], moeda: USD, base: 120, unidade: por_processo, ruido_rel: 0.10, prob: 0.80}

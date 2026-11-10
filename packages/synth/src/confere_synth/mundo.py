@@ -1,6 +1,6 @@
 """Mundo sintético, parte 1: fornecedores e clientes fictícios.
 
-Os 14 fornecedores são fixos (definidos aqui, não sorteados) para dar estabilidade ao
+Os 15 fornecedores são fixos (definidos aqui, não sorteados) para dar estabilidade ao
 dataset; o `rng` só entra nos CNPJs fictícios. Nenhum nome corresponde a empresa real
 conhecida (checado por busca na web em 2026-11-10; nomes vizinhos de empresas reais, como
 "Atlantic Ocean Line" ou "Boreal Shipping", são apenas parecidos) e todos os e-mails
@@ -13,23 +13,28 @@ porque pertence a uma instituição real.
 """
 
 import json
+import math
 import random
 import re
 import unicodedata
 import uuid
 from collections.abc import Callable
 from datetime import date, timedelta
+from decimal import ROUND_HALF_EVEN, Decimal
 from functools import partial
+from itertools import combinations
 from pathlib import Path
 
 from confere_core.costcode.catalogo import Catalogo
 from confere_core.validators import iso6346
+from confere_synth.custos import CAMINHO_PADRAO, CustosTipicos
 from confere_synth.modelos import (
     Cliente,
     Fornecedor,
     Modal,
     Mundo,
     Processo,
+    Provisao,
     Referencia,
     TipoFornecedor,
 )
@@ -115,7 +120,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "en",
         "USD",
         "boreal-line.example",
-        2,
+        1,
         ["Boreal Container Line AS", "BOREAL CONTAINER LINE", "Boreal CL"],
         {
             "FRETE_MAR": ["Sea Freight", "Ocean Freight FCL"],
@@ -136,7 +141,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "en",
         "USD",
         "tarquin-marine.example",
-        3,
+        1,
         ["Tarquin Marine Lines Ltd", "TARQUIN MARINE LINES LTD.", "Tarquin Marine"],
         {
             "FRETE_MAR": ["Freight", "Ocean Frt"],
@@ -148,6 +153,26 @@ _ESPECIFICACOES: list[_Spec] = [
             "DEMURRAGE": ["Demurrage", "DEM"],
         },
     ),
+    # NVOCC NACIONAL: cobra em BRL (PTAX da emissão) o que está previsto em USD. É o cenário do
+    # erro "câmbio errado" (CF-36); fatura em PT, no estilo 3.
+    (
+        "consolidadora-aurora",
+        "Consolidadora Marítima Aurora Ltda.",
+        "armador",
+        "BR",
+        "pt",
+        "BRL",
+        "consolidadora-aurora.example",
+        3,
+        ["Consolidadora Aurora", "CONSOLIDADORA MARITIMA AURORA LTDA", "Aurora NVOCC"],
+        {
+            "FRETE_MAR": ["Frete Marítimo", "Frete Internacional"],
+            "BAF": ["Ajuste de Combustível (BAF)", "BAF"],
+            "THC_ORIG": ["THC Origem", "Terminal Handling Origem"],
+            "BL_FEE": ["Emissão de BL", "Taxa de BL"],
+            "DOC_FEE_ORIG": ["Taxa de Documentação"],
+        },
+    ),
     # ------------------------------------------------- agentes no exterior (EN)
     (
         "jade-river-logistics",
@@ -157,7 +182,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "en",
         "CNY",
         "jaderiver-logistics.example",
-        4,
+        2,
         ["Jade River Logistics", "JADE RIVER LOGISTICS CO LTD", "Jade River Logistics (Shenzhen)"],
         {
             "FRETE_MAR": ["Ocean Freight", "Sea Freight"],
@@ -176,7 +201,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "en",
         "EUR",
         "nordhaven-freight.example",
-        5,
+        2,
         ["Nordhaven Freight Partners", "NORDHAVEN FREIGHT PARTNERS GMBH", "Nordhaven Freight"],
         {
             "FRETE_MAR": ["Ocean Freight", "Seefracht"],
@@ -197,7 +222,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "terminalmarazul.example",
-        6,
+        3,
         ["Terminal Mar Azul", "TERMINAL MAR AZUL S/A", "TMA Mucuripe"],
         {
             "THC_DEST": ["Capatazia", "THC Destino", "Movimentação de Contêiner"],
@@ -216,7 +241,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "cajueiro-pecem.example",
-        1,
+        3,
         ["Terminal Cajueiro Pecém", "TERM. CAJUEIRO PECEM", "Cajueiro Pecém"],
         {
             "THC_DEST": ["DTHC", "Taxa de Movimentação Destino"],
@@ -234,7 +259,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "marealta-suape.example",
-        2,
+        3,
         ["Terminal Maré Alta", "TERMINAL MARE ALTA SUAPE", "Maré Alta Suape"],
         {
             "THC_DEST": ["THC Dest", "Capatazia Importação"],
@@ -254,7 +279,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "armazens-carnauba.example",
-        3,
+        4,
         ["Armazéns Gerais Carnaúba", "ARMAZENS GERAIS CARNAUBA LTDA", "AG Carnaúba"],
         {
             "ARMAZENAGEM": ["Armazenagem Alfandegada", "Armazenagem"],
@@ -291,7 +316,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "transp-mandacaru.example",
-        5,
+        3,
         ["Transportadora Mandacaru", "TRANSP MANDACARU LTDA", "Mandacaru Transportes"],
         {
             "FRETE_RODO": ["Frete Rodoviário", "Transporte Rodoviário"],
@@ -308,7 +333,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "rodoviario-ventania.example",
-        6,
+        3,
         ["Rodoviário Ventania", "RODOVIARIO VENTANIA CARGAS", "Ventania Cargas"],
         {
             "FRETE_RODO": ["Frete Terrestre", "Frete Peso/Valor"],
@@ -326,7 +351,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "despachos-farol.example",
-        1,
+        5,
         ["Despachos Farol", "DESPACHOS ADUANEIROS FAROL LTDA", "Farol Despachos"],
         {
             "HONORARIO_DESPACHO": ["Honorários de Despacho", "Honorarios Despachante"],
@@ -345,7 +370,7 @@ _ESPECIFICACOES: list[_Spec] = [
         "pt",
         "BRL",
         "lagoaazul-aduaneira.example",
-        2,
+        5,
         ["Lagoa Azul Assessoria", "LAGOA AZUL ASSESSORIA ADUANEIRA", "Lagoa Azul Aduaneira"],
         {
             "HONORARIO_DESPACHO": ["Honorário Despacho Aduaneiro", "Comissão de Despacho"],
@@ -374,7 +399,7 @@ _NOMES_CLIENTES = [
 
 
 def gerar_fornecedores(rng: random.Random, catalogo: Catalogo) -> list[Fornecedor]:
-    """14 fornecedores fixos em 6 tipos; o `rng` só define os CNPJs dos nacionais."""
+    """15 fornecedores fixos em 6 tipos; o `rng` só define os CNPJs dos nacionais."""
     conhecidos = set(catalogo.codigos())
     usados: set[str] = set()
     fornecedores: list[Fornecedor] = []
@@ -608,6 +633,231 @@ def gerar_processos(
     return processos
 
 
+# ---------------------------------------------------------------- provisões
+
+FAIXA_PROVISOES_MARITIMO = (8, 15)
+FAIXA_PROVISOES_RODOVIARIO = (6, 8)
+PCT_PROCESSOS_PAR_PROXIMO = 0.25  # meta; o requisito mínimo é 20%
+TOLERANCIA_PAR_PROXIMO = Decimal("0.12")  # maior/menor <= 1 + tolerância
+_CENTAVO = Decimal("0.01")
+
+
+def _arredondar(valor: Decimal) -> Decimal:
+    """2 casas (ROUND_HALF_EVEN) e sempre positivo."""
+    return max(valor.quantize(_CENTAVO, rounding=ROUND_HALF_EVEN), _CENTAVO)
+
+
+def _fator_ruido(rng: random.Random, ruido_rel: float) -> Decimal:
+    fator = max(1 + rng.gauss(0, ruido_rel), 0.2)
+    return Decimal(str(round(fator, 6)))
+
+
+def _converter(valor: Decimal, de: str, para: str, cambio: dict[str, Decimal]) -> Decimal:
+    return valor * cambio[de] / cambio[para]
+
+
+def _ligados(proc: Processo, por_id: dict[str, Fornecedor]) -> list[Fornecedor]:
+    ids = (
+        proc.armador_id,
+        proc.agente_exterior_id,
+        proc.terminal_id,
+        proc.armazem_id,
+        proc.despachante_id,
+        proc.transportadora_id,
+    )
+    ausentes = [i for i in ids if i and i not in por_id]
+    if ausentes:
+        raise ValueError(f"{proc.codigo}: fornecedor ausente: {ausentes}")
+    return [por_id[i] for i in ids if i]
+
+
+def _selecionar(
+    rng: random.Random,
+    proc: Processo,
+    candidatos: dict[str, list[Fornecedor]],
+    custos: CustosTipicos,
+    ordem: dict[str, int],
+) -> list[str]:
+    """Sorteia os códigos do processo por `prob` e ajusta à faixa do modal."""
+    minimo, maximo = (
+        FAIXA_PROVISOES_MARITIMO if proc.modal == "maritimo" else FAIXA_PROVISOES_RODOVIARIO
+    )
+    if len(candidatos) < minimo:
+        raise ValueError(f"{proc.codigo}: só {len(candidatos)} códigos possíveis, mínimo {minimo}")
+    sel = {c for c in candidatos if rng.random() < custos.codigos[c].prob}
+    while len(sel) > maximo:  # tira opcionais (prob < 1), os menos prováveis primeiro
+        opcionais = sorted((c for c in sel if custos.codigos[c].prob < 1.0), key=ordem.__getitem__)
+        if not opcionais:
+            raise ValueError(f"{proc.codigo}: obrigatórios demais para o máximo {maximo}")
+        sel.discard(rng.choices(opcionais, [1 - custos.codigos[c].prob for c in opcionais])[0])
+    while len(sel) < minimo:  # acrescenta opcionais, os mais prováveis primeiro
+        faltantes = sorted((c for c in candidatos if c not in sel), key=ordem.__getitem__)
+        sel.add(rng.choices(faltantes, [max(custos.codigos[c].prob, 0.05) for c in faltantes])[0])
+    return sorted(sel, key=ordem.__getitem__)
+
+
+def _provisoes_do_processo(
+    rng: random.Random,
+    proc: Processo,
+    por_id: dict[str, Fornecedor],
+    custos: CustosTipicos,
+    ordem: dict[str, int],
+) -> list[Provisao]:
+    n_conteineres = sum(r.tipo == "conteiner" for r in proc.referencias)
+    n_bls = sum(r.tipo == "bl_house" for r in proc.referencias)
+    cif_min, cif_max = custos.cif_por_conteiner_brl
+    cif = Decimal(str(round(rng.uniform(float(cif_min), float(cif_max)), 2))) * n_conteineres
+
+    ligados = _ligados(proc, por_id)
+    candidatos: dict[str, list[Fornecedor]] = {}
+    for codigo in sorted(ordem, key=ordem.__getitem__):
+        cfg = custos.codigos[codigo]
+        fs = [f for f in ligados if codigo in f.codigos and f.tipo in cfg.tipo_fornecedor]
+        if fs:
+            candidatos[codigo] = fs
+    for codigo in list(candidatos):  # percentual de outro código exige o código-base
+        base = custos.codigos[codigo].percentual_de
+        if base not in (None, "cif") and base not in candidatos:
+            del candidatos[codigo]
+
+    escolhidos = _selecionar(rng, proc, candidatos, custos, ordem)
+    valores: dict[str, Decimal] = {}
+    donos: dict[str, Fornecedor] = {}
+    for dependente in (False, True):  # códigos-base primeiro, depois os percentuais deles
+        for codigo in escolhidos:
+            cfg = custos.codigos[codigo]
+            if (cfg.percentual_de not in (None, "cif")) != dependente:
+                continue
+            donos[codigo] = rng.choice(candidatos[codigo])
+            if cfg.percentual_de is None:
+                quantidade = {
+                    "por_conteiner": n_conteineres,
+                    "por_bl": n_bls,
+                    "por_processo": 1,
+                    "por_dia": n_conteineres * rng.randint(*(cfg.dias or (1, 1))),
+                }[cfg.unidade]
+                bruto = cfg.base * quantidade
+            else:
+                if cfg.percentual_de == "cif":
+                    referencia = _converter(cif, "BRL", cfg.moeda, custos.cambio_referencia)
+                else:
+                    origem = custos.codigos[cfg.percentual_de].moeda
+                    referencia = _converter(
+                        valores[cfg.percentual_de], origem, cfg.moeda, custos.cambio_referencia
+                    )
+                bruto = max(referencia * cfg.base / 100, cfg.minimo or Decimal(0))
+            valores[codigo] = _arredondar(bruto * _fator_ruido(rng, cfg.ruido_rel))
+
+    return [
+        Provisao(
+            id=uuid.UUID(int=rng.getrandbits(128), version=4),
+            processo_id=proc.id,
+            fornecedor_id=donos[codigo].id,
+            codigo_custo=codigo,
+            moeda=custos.codigos[codigo].moeda,
+            valor=valores[codigo],
+        )
+        for codigo in escolhidos
+    ]
+
+
+def _razao(a: Decimal, b: Decimal) -> Decimal:
+    return max(a, b) / min(a, b)
+
+
+def _tem_par_proximo(provisoes: list[Provisao]) -> bool:
+    """Duas provisões do mesmo fornecedor e moeda, em códigos diferentes, com valores até
+    12% distantes (maior/menor <= 1,12)."""
+    return any(
+        a.fornecedor_id == b.fornecedor_id
+        and a.moeda == b.moeda
+        and a.codigo_custo != b.codigo_custo
+        and _razao(a.valor, b.valor) <= 1 + TOLERANCIA_PAR_PROXIMO
+        for a, b in combinations(provisoes, 2)
+    )
+
+
+def _forcar_par_proximo(
+    rng: random.Random,
+    provisoes: list[Provisao],
+    custos: CustosTipicos,
+    codigos_base: set[str],
+) -> list[Provisao] | None:
+    """Aproxima (±1% a ±10%) o par de mesmo fornecedor e moeda que já está mais perto.
+
+    Só mexe em provisões com ruído, que não sejam percentuais nem código-base de percentual,
+    para não quebrar relações como AFRMM = 8% do frete.
+    """
+    melhor: tuple[Decimal, int, int] | None = None
+    for i, a in enumerate(provisoes):
+        for j, b in enumerate(provisoes):
+            cfg = custos.codigos[b.codigo_custo]
+            if (
+                i == j
+                or a.fornecedor_id != b.fornecedor_id
+                or a.moeda != b.moeda
+                or cfg.percentual_de is not None
+                or cfg.ruido_rel == 0
+                or b.codigo_custo in codigos_base
+            ):
+                continue
+            distancia = _razao(a.valor, b.valor)
+            if melhor is None or distancia < melhor[0]:
+                melhor = (distancia, i, j)
+    if melhor is None:
+        return None
+    _, i, j = melhor
+    delta = Decimal(str(round(rng.uniform(0.01, 0.10), 4))) * rng.choice((-1, 1))
+    resultado = list(provisoes)
+    resultado[j] = provisoes[j].model_copy(
+        update={"valor": _arredondar(provisoes[i].valor * (1 + delta))}
+    )
+    return resultado
+
+
+def gerar_provisoes(
+    rng: random.Random,
+    processos: list[Processo],
+    fornecedores: list[Fornecedor],
+    catalogo: Catalogo,
+    custos: CustosTipicos | None = None,
+) -> list[Provisao]:
+    """Provisões (custo previsto) de cada processo, todas `aberta`.
+
+    Só entram fornecedores ligados ao processo e códigos que eles cobram; cada código aparece
+    no máximo uma vez por processo. Valor = base x quantidade x (1 + N(0, ruido_rel)), em
+    `Decimal` com 2 casas. Marítimo tem 8 a 15 provisões e rodoviário puro 6 a 8. Em pelo
+    menos 25% dos processos (requisito: 20%) há duas provisões do mesmo fornecedor e moeda
+    com valores até 12% distantes, em códigos diferentes: o caso em que o casamento ótimo
+    (E6) vence o guloso.
+    """
+    custos = custos or CustosTipicos.carregar(CAMINHO_PADRAO, catalogo)
+    custos.validar(catalogo)
+    por_id = {f.id: f for f in fornecedores}
+    ordem = {codigo: i for i, codigo in enumerate(catalogo.codigos())}
+    por_processo = [_provisoes_do_processo(rng, p, por_id, custos, ordem) for p in processos]
+
+    codigos_base = {
+        cfg.percentual_de
+        for cfg in custos.codigos.values()
+        if cfg.percentual_de not in (None, "cif")
+    } - {None}
+    meta = math.ceil(PCT_PROCESSOS_PAR_PROXIMO * len(processos))
+    ja_tem = {i for i, provs in enumerate(por_processo) if _tem_par_proximo(provs)}
+    faltam = meta - len(ja_tem)
+    if faltam > 0:
+        sem_par = [i for i in range(len(por_processo)) if i not in ja_tem]
+        rng.shuffle(sem_par)
+        for i in sem_par:
+            if faltam <= 0:
+                break
+            ajustado = _forcar_par_proximo(rng, por_processo[i], custos, codigos_base)
+            if ajustado is not None:
+                por_processo[i] = ajustado
+                faltam -= 1
+    return [p for provs in por_processo for p in provs]
+
+
 # -------------------------------------------------------------------- mundo
 
 
@@ -617,13 +867,20 @@ def _catalogo_padrao() -> Catalogo:
 
 
 def gerar_mundo(seed: int, catalogo: Catalogo | None = None) -> Mundo:
-    """Mundo completo e determinístico dado o `seed` (provisões vêm na CF-31)."""
+    """Mundo completo (fornecedores, clientes, processos e provisões), determinístico no `seed`."""
     rng = random.Random(seed)
     catalogo = catalogo or _catalogo_padrao()
     fornecedores = gerar_fornecedores(rng, catalogo)
     clientes = gerar_clientes(rng)
     processos = gerar_processos(rng, clientes, fornecedores)
-    return Mundo(seed=seed, fornecedores=fornecedores, clientes=clientes, processos=processos)
+    provisoes = gerar_provisoes(rng, processos, fornecedores, catalogo)
+    return Mundo(
+        seed=seed,
+        fornecedores=fornecedores,
+        clientes=clientes,
+        processos=processos,
+        provisoes=provisoes,
+    )
 
 
 def salvar_mundo(mundo: Mundo, saida: str | Path) -> Path:
