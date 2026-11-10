@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: confere
+          POSTGRES_PASSWORD: confere
+          POSTGRES_DB: confere
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U confere -d confere"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      ENV: test
+      DATABASE_URL: postgresql+psycopg://confere:confere@localhost:5432/confere_test
+      DATABASE_URL_WORKER: postgresql+psycopg://confere:confere@localhost:5432/confere_test
+      STORAGE_BACKEND: local
+      LLM_OFFLINE: "true"
+      PTAX_OFFLINE: "true"
+      PGHOST: localhost
+      PGUSER: confere
+      PGPASSWORD: confere
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verificação de segredos (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
+
+      - name: Bibliotecas do sistema (WeasyPrint, PyMuPDF, python-magic)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libmagic1
+
+      - name: Extensões e banco de testes
+        run: |
+          psql -d confere -v ON_ERROR_STOP=1 \
+            -c "CREATE EXTENSION IF NOT EXISTS vector" \
+            -c "CREATE EXTENSION IF NOT EXISTS pg_trgm" \
+            -c "CREATE EXTENSION IF NOT EXISTS unaccent" \
+            -c "CREATE DATABASE confere_test"
+          psql -d confere_test -v ON_ERROR_STOP=1 \
+            -c "CREATE EXTENSION IF NOT EXISTS vector" \
+            -c "CREATE EXTENSION IF NOT EXISTS pg_trgm" \
+            -c "CREATE EXTENSION IF NOT EXISTS unaccent"
+
+      - run: uv sync --all-packages
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy packages apps
+      - run: uv run pytest -m "not llm" --cov=confere_core --cov-report=xml
+
+  frontend:
+    runs-on: ubuntu-latest
+    # O frontend nasce na CF-4; até lá este job é pulado.
+    if: ${{ hashFiles('apps/web/package.json') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/web/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      - run: pnpm -C apps/web install --frozen-lockfile
+      - run: pnpm -C apps/web lint
+      - run: pnpm -C apps/web typecheck
+      - run: pnpm -C apps/web test
+      - run: pnpm -C apps/web build
