@@ -32,10 +32,10 @@ def fornecedores(catalogo: Catalogo) -> list[Fornecedor]:
 # ------------------------------------------------------------ fornecedores
 
 
-def test_quatorze_fornecedores_em_seis_tipos(fornecedores: list[Fornecedor]) -> None:
-    assert len(fornecedores) == 14
+def test_quinze_fornecedores_em_seis_tipos(fornecedores: list[Fornecedor]) -> None:
+    assert len(fornecedores) == 15
     assert Counter(f.tipo for f in fornecedores) == {
-        "armador": 3,
+        "armador": 4,  # 3 estrangeiros + o NVOCC nacional
         "agente_exterior": 2,
         "terminal": 3,
         "armazem": 2,
@@ -45,12 +45,19 @@ def test_quatorze_fornecedores_em_seis_tipos(fornecedores: list[Fornecedor]) -> 
 
 
 def test_ids_e_nomes_unicos(fornecedores: list[Fornecedor]) -> None:
-    assert len({f.id for f in fornecedores}) == 14
-    assert len({f.nome for f in fornecedores}) == 14
+    assert len({f.id for f in fornecedores}) == 15
+    assert len({f.nome for f in fornecedores}) == 15
 
 
-def test_os_seis_estilos_sao_cobertos(fornecedores: list[Fornecedor]) -> None:
-    assert {f.estilo_id for f in fornecedores} == {1, 2, 3, 4, 5, 6}
+def test_estilo_do_fornecedor_segue_o_template_do_tipo(fornecedores: list[Fornecedor]) -> None:
+    # CF-32: 1 armador, 2 agente, 3 terminal, 4 armazém, 5 despachante. O 6 é o extrato do armador
+    # (documento, não fornecedor); transportadoras emitem CT-e e ficam com 3 só por validação.
+    # O NVOCC nacional (armador, em PT) usa o estilo 3, o de fatura em português.
+    esperado = {("armador", 1), ("armador", 3), ("agente_exterior", 2), ("terminal", 3),
+                ("armazem", 4), ("despachante", 5), ("transportadora", 3)}  # fmt: skip
+    assert {(f.tipo, f.estilo_id) for f in fornecedores} == esperado
+    estrangeiros = [f for f in fornecedores if f.tipo == "armador" and f.pais != "BR"]
+    assert {f.estilo_id for f in estrangeiros} == {1}
 
 
 def test_todo_email_termina_em_example(fornecedores: list[Fornecedor]) -> None:
@@ -59,12 +66,14 @@ def test_todo_email_termina_em_example(fornecedores: list[Fornecedor]) -> None:
 
 def test_idioma_moeda_e_pais_por_tipo(fornecedores: list[Fornecedor]) -> None:
     for f in fornecedores:
-        if f.tipo in ("armador", "agente_exterior"):
-            assert (f.idioma, f.pais != "BR") == ("en", True)
+        if f.tipo in ("armador", "agente_exterior") and f.pais != "BR":
+            assert f.idioma == "en"
         else:
             assert (f.idioma, f.pais, f.moeda_padrao) == ("pt", "BR", "BRL")
-    armadores = [f for f in fornecedores if f.tipo == "armador"]
-    assert all(f.moeda_padrao == "USD" for f in armadores)
+    armadores = [f for f in fornecedores if f.tipo == "armador" and f.pais != "BR"]
+    assert len(armadores) == 3 and all(f.moeda_padrao == "USD" for f in armadores)
+    nvocc = [f for f in fornecedores if f.tipo == "armador" and f.pais == "BR"]
+    assert [f.id for f in nvocc] == ["consolidadora-aurora"]  # nacional: fatura em BRL
     agentes = {f.pais: f.moeda_padrao for f in fornecedores if f.tipo == "agente_exterior"}
     assert agentes == {"CN": "CNY", "DE": "EUR"}
 
@@ -110,7 +119,7 @@ def test_cnpj_so_para_nacionais_e_sempre_ficticio(fornecedores: list[Fornecedor]
         else:
             assert f.cnpj_ficticio is None, f.id
     cnpjs = [f.cnpj_ficticio for f in fornecedores if f.cnpj_ficticio]
-    assert len(cnpjs) == len(set(cnpjs)) == 9
+    assert len(cnpjs) == len(set(cnpjs)) == 10
 
 
 def test_determinismo_por_semente(catalogo: Catalogo) -> None:
