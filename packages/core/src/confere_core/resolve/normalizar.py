@@ -24,9 +24,7 @@ from confere_core.validators import iso6346
 _SEPARADORES = re.compile(r"[\s\-/._:#]")
 _SEP_CLASSE = r"[\s:.\-#/]"
 
-_PREFIXOS_BL = re.compile(
-    rf"^(?:BILL\s+OF\s+LADING|B/L|MBL|HBL|BL|NUMBER|NO){_SEP_CLASSE}+(?=\S)"
-)
+_PREFIXOS_BL = re.compile(rf"^(?:BILL\s+OF\s+LADING|B/L|MBL|HBL|BL|NUMBER|NO){_SEP_CLASSE}+(?=\S)")
 _PREFIXOS_REF_CLIENTE = re.compile(
     rf"^(?:CUSTOMER\s+REF|REFERENCIA|PEDIDO|REF|PO)(?:{_SEP_CLASSE}+|(?=\d))"
 )
@@ -48,6 +46,11 @@ PADROES_REFERENCIA = [
 def sem_acento_maiusculas(texto: str) -> str:
     decomposto = unicodedata.normalize("NFKD", texto)
     return "".join(c for c in decomposto if not unicodedata.combining(c)).upper()
+
+
+def normalizar_nome(texto: str) -> str:
+    """Nome de empresa comparável: sem acento, maiúsculas, só letras e dígitos, espaços únicos."""
+    return " ".join(re.sub(r"[^A-Z0-9]+", " ", sem_acento_maiusculas(texto)).split())
 
 
 def _tirar_prefixos(texto: str, padrao: re.Pattern[str]) -> str:

@@ -148,7 +148,7 @@ codigos:
     grupo: rodoviario
     moeda_tipica: BRL
     unidade: por_processo
-    sinonimos: ["Frete Rodoviário", "Transporte Rodoviário", "Trucking", "Road Freight", "Frete Terrestre", "Inland Haulage"]
+    sinonimos: ["Frete Rodoviário", "Transporte Rodoviário", "Trucking", "Road Freight", "Frete Terrestre", "Inland Haulage", "Frete Peso"]
   - codigo: PEDAGIO
     descricao: Pedágio do trecho rodoviário
     grupo: rodoviario
