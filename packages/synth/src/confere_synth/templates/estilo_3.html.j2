@@ -1,0 +1,121 @@
+{% extends "_base.html.j2" %}
+{% block css %}
+.topo { border-bottom: 2px solid #0b6b5d; padding-bottom: 5mm; margin-bottom: 6mm; }
+.marca td { vertical-align: middle; }
+.marca .nome { padding-left: 3mm; font-size: 12.5pt; font-weight: bold; color: #0b6b5d; }
+.titulo { text-align: right; font-size: 15pt; font-weight: bold; color: #0b6b5d; }
+.numero { text-align: right; font-size: 9pt; margin-top: 1mm; }
+.caixas td { width: 50%; padding: 0 3mm 0 0; font-size: 9pt; }
+.caixa { border: 1px solid #b6d3cd; padding: 2.5mm 3mm; min-height: 20mm; }
+.caixa .rot { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: #0b6b5d; font-weight: bold; margin-bottom: 1mm; }
+.processo { margin-top: 4mm; border: 1px solid #b6d3cd; padding: 2mm 3mm; font-size: 9pt; }
+.processo .valor { display: inline-block; min-width: 55mm; border-bottom: 1px solid #888; margin-left: 2mm; }
+.sec { margin: 6mm 0 1.5mm 0; font-weight: bold; font-size: 9pt; color: #0b6b5d; text-transform: uppercase; }
+.servicos th { background: #e3f0ed; color: #0b4c42; padding: 1.8mm 2mm; font-size: 8.5pt; border: 1px solid #b6d3cd; }
+.servicos td { padding: 1.8mm 2mm; border: 1px solid #d5e4e0; }
+.cntr th { background: #f1f5f4; padding: 1.5mm 2mm; font-size: 8pt; border: 1px solid #d5e4e0; }
+.cntr td { padding: 1.5mm 2mm; border: 1px solid #d5e4e0; font-size: 9pt; }
+.soma { width: 75mm; margin: 5mm 0 0 auto; }
+.soma td { padding: 1.8mm 2.5mm; border: 1px solid #b6d3cd; }
+.soma .total td { background: #0b6b5d; color: #fff; font-weight: bold; font-size: 11pt; }
+.obs { margin-top: 7mm; font-size: 8.5pt; color: #444; }
+{% endblock %}
+{% block corpo %}
+<table class="cab topo">
+  <tr>
+    <td>
+      <table class="marca">
+        <tr>
+          <td>
+            <svg width="42" height="42" viewBox="0 0 42 42">
+              <rect x="1" y="1" width="40" height="40" rx="6" fill="#0b6b5d"/>
+              <rect x="8" y="22" width="26" height="4" fill="#ffffff"/>
+              <rect x="12" y="12" width="6" height="10" fill="#ffffff"/>
+              <rect x="22" y="15" width="8" height="7" fill="#9fd6ca"/>
+              <path d="M6 30 H36" stroke="#ffffff" stroke-width="2"/>
+            </svg>
+          </td>
+          <td class="nome">{{ fornecedor.nome }}</td>
+        </tr>
+      </table>
+      <p class="small muted" style="margin-top: 2mm">
+        {{ fornecedor.endereco }}
+        {% if fornecedor.cnpj %}<br>CNPJ {{ fornecedor.cnpj }} (fictício){% endif %}
+        <br>{{ fornecedor.email }}
+      </p>
+    </td>
+    <td>
+      <div class="titulo">FATURA DE SERVIÇOS</div>
+      <div class="numero">Nº <strong>{{ doc.numero }}</strong></div>
+      <div class="numero">Emissão: {{ doc.emissao|data_pt }}{% if doc.vencimento %} · Vencimento: {{ doc.vencimento|data_pt }}{% endif %}</div>
+    </td>
+  </tr>
+</table>
+
+<table class="caixas">
+  <tr>
+    <td>
+      <div class="caixa">
+        <div class="rot">Tomador</div>
+        <strong>{{ tomador.nome }}</strong><br>{{ tomador.endereco }}
+        {% if tomador.cnpj %}<br>CNPJ {{ tomador.cnpj }}{% endif %}
+      </div>
+    </td>
+    <td>
+      <div class="caixa">
+        <div class="rot">Embarque</div>
+        BL: {{ processo_refs.bl_master or "—" }}<br>
+        Navio/Viagem: {{ processo_refs.navio or "—" }}{% if processo_refs.viagem %} / {{ processo_refs.viagem }}{% endif %}
+      </div>
+    </td>
+  </tr>
+</table>
+
+<div class="processo">Processo do cliente:<span class="valor">{{ processo_refs.ref_cliente or "" }}</span></div>
+
+<div class="sec">Serviços prestados</div>
+<table class="servicos">
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Descrição</th>
+      <th class="num">Quantidade</th>
+      <th class="num">Valor Unit.</th>
+      <th class="num">Valor Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in linhas %}
+    <tr>
+      <td class="mono small">{{ l.codigo or "—" }}</td>
+      <td>{{ l.descricao }}{% if l.cambio %}<div class="small muted">{{ l.cambio }}</div>{% endif %}</td>
+      <td class="num">{{ l.qtd|qtd_pt }}</td>
+      <td class="num">{{ l.valor_unit|num_pt }}</td>
+      <td class="num">{{ l.valor|num_pt }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="sec">Dados dos contêineres</div>
+<table class="cntr">
+  <thead><tr><th>Contêiner</th><th>BL Master</th><th>BL House</th></tr></thead>
+  <tbody>
+    {% for c in processo_refs.conteineres %}
+    <tr>
+      <td class="mono">{{ c }}</td>
+      <td>{{ processo_refs.bl_master or "—" }}</td>
+      <td>{{ processo_refs.bl_house|join(", ") or "—" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3" class="muted">Sem contêineres informados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="soma">
+  <tr class="total"><td>VALOR TOTAL</td><td class="num">{{ doc.total|dinheiro_pt(doc.moeda) }}</td></tr>
+</table>
+
+{% if doc.observacoes %}<p class="obs"><strong>Observações:</strong> {{ doc.observacoes }}</p>{% endif %}
+{% endblock %}

@@ -109,3 +109,84 @@ pnpm -C apps/web install
 pnpm -C apps/web dev          # http://localhost:3000
 pnpm -C apps/web typecheck    # gera os tipos de rota do Next e roda tsc
 ```
+
+## Pré-visualização das faturas sintéticas (PDF)
+
+```
+uv run python -m confere_synth.render_preview      # grava data/preview/estilo_1.pdf ... estilo_6.pdf
+```
+
+A pasta `data/preview/` está no `.gitignore`. Sem as bibliotecas do WeasyPrint o comando grava só
+os `.html` ao lado e sai com código 1.
+
+**Windows (MSYS2):** instale o Pango no ambiente UCRT64 e aponte o WeasyPrint para as DLLs:
+
+```
+pacman -S mingw-w64-ucrt-x86_64-pango
+set WEASYPRINT_DLL_DIRECTORIES=C:\msys64\ucrt64\bin     (PowerShell: $env:WEASYPRINT_DLL_DIRECTORIES = 'C:\msys64\ucrt64\bin')
+```
+
+Ubuntu/Debian e macOS: veja a seção do WeasyPrint acima.
+
+## Gerar as faturas sintéticas (CF-33)
+
+```
+uv run python -m confere_synth.cli faturas --seed 42 --saida data/seed42
+```
+
+Gera o mundo (determinístico no seed), as faturas e extratos limpos e os PDFs em
+`data/seed42/documentos/`, e grava `mundo.json`, `documentos.json` e `manifest.json` (com o
+SHA-256 de cada PDF; chaves de outras etapas já presentes no manifest são preservadas).
+Precisa das bibliotecas do WeasyPrint (veja a seção de pré-visualização); sem elas o comando
+termina com código 1 e não grava nada.
+
+## CT-e, DACTE e ruído de foto (CF-34, CF-35, CF-37)
+
+```
+uv run python -m confere_synth.cli ctes  --seed 42 --saida data/seed42   # XML do CT-e + DACTE (PDF)
+uv run python -m confere_synth.cli ruido --seed 42 --saida data/seed42   # depois de `faturas`
+```
+
+- `ctes` não precisa do Pango (o DACTE usa fpdf2). O XML é **não assinado** e só para testes.
+  Os DACTE ficam em `documentos/<id>_dacte.pdf` e entram no manifest com `tipo: "dacte"`,
+  `origem_xml` e `incluir_no_lote: false`.
+- `ruido` precisa dos PDFs de `faturas`. Reverte o ruído anterior antes de sortear (idempotente),
+  mantém o PDF limpo ao lado e marca no manifest `ruido`, `arquivo_original` e, para o JPG,
+  `foto_torta: true`.
+- Os três comandos preservam no `manifest.json` as chaves que os outros já gravaram.
+
+## PTAX congelada (CF-40)
+
+```
+uv run python infra/scripts/baixar_ptax.py        # grava data/seed42/ptax.csv
+```
+
+Baixa do BCB (Olinda) só o boletim de **Fechamento** de USD, EUR e CNY, de 2026-07-15 a 2026-11-30.
+O script **não inventa** nada: datas ainda não publicadas ficam de fora (rode de novo depois de
+30/11 para completar) e o CNY não é publicado pela PTAX, então não tem linhas. Fim de semana e
+feriado também não entram (a regra do último dia útil é da CF-71). Leitura no core:
+`confere_core.fx.tabela.TabelaPTAX.carregar(path).get(moeda, data)`.
+
+## Classificação com LLM (CF-45)
+
+O `GeminiClient` (`confere_core.llm.client`) usa o SDK `google-genai`; os testes usam o
+`FakeLLMClient` e **não chamam a API**. Preços por milhão de tokens ficam em
+`config/llm_precos.yaml` (valores de referência: conferir o preço vigente).
+
+## Erros injetados (CF-36)
+
+`config/erros.yaml` define a taxa de cada erro; `confere_synth.erros.injetar(rng, documentos,
+mundo, cfg, ptax=...)` aplica, em ordem: valor acima → taxa não prevista → câmbio errado →
+referência cruzada → duplicada. A quantidade é cota (`round(taxa x elegíveis)`, mínimo 1).
+
+- **Câmbio errado** precisa de fatura em BRL de valor previsto em USD/EUR. O mundo ganhou um
+  fornecedor nacional para isso, o NVOCC **Consolidadora Marítima Aurora Ltda.**: ele fatura em
+  BRL pela PTAX de venda da emissão e mostra "USD 1.800,00 × taxa 5,6120 = R$ ..." mais a linha
+  informativa "Taxa de câmbio aplicada". Sem cotação para a data, a emissão dessas faturas é
+  limitada à última cotação de `data/seed42/ptax.csv`.
+- `valor_erro_brl` usa a PTAX de venda da emissão (olha até 5 dias para trás) e fica nulo sem
+  cotação (CNY, datas fora da tabela). Nada é inventado.
+- Duplicadas: metade é cópia byte a byte do PDF original (o `renderizar` copia o arquivo; o
+  original precisa estar renderizado antes) e metade é re-renderizada com emissão +1 dia.
+- O `injetar` é puro; ligar a re-renderização dos documentos alterados e das cópias ao comando
+  `gerar` é da CF-39.

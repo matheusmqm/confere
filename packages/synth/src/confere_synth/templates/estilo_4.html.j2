@@ -1,0 +1,76 @@
+{% extends "_base.html.j2" %}
+{% block fonte %}"DejaVu Sans Condensed", "DejaVu Sans", "Liberation Sans Narrow", "Liberation Sans", Arial, sans-serif{% endblock %}
+{% block css %}
+body { font-size: 8.5pt; line-height: 1.25; }
+.grade { border: 1px solid #333; }
+.grade td, .grade th { border: 1px solid #333; padding: 1.2mm 1.6mm; }
+.grade th { background: #d9d9d9; font-size: 7.5pt; text-transform: uppercase; }
+.grade .titulo { background: #333; color: #fff; text-align: center; font-size: 12pt; font-weight: bold; letter-spacing: 0.1em; padding: 2mm; }
+.grade .k { background: #efefef; font-weight: bold; width: 26mm; font-size: 7.5pt; text-transform: uppercase; }
+.grade .tot td { background: #d9d9d9; font-weight: bold; font-size: 10pt; }
+.grade tr.alt td { background: #f7f7f7; }
+.espaco { height: 4mm; }
+.obs { margin-top: 3mm; font-size: 7.5pt; color: #333; border: 1px solid #333; padding: 1.5mm 2mm; }
+{% endblock %}
+{% block corpo %}
+<table class="grade">
+  <tr><td class="titulo" colspan="6">NOTA DE DÉBITO Nº {{ doc.numero }}</td></tr>
+  <tr>
+    <td class="k">Emitente</td><td colspan="3"><strong>{{ fornecedor.nome }}</strong><br>{{ fornecedor.endereco }}</td>
+    <td class="k">CNPJ</td><td>{{ fornecedor.cnpj or "—" }}</td>
+  </tr>
+  <tr>
+    <td class="k">Cliente</td><td colspan="3"><strong>{{ tomador.nome }}</strong><br>{{ tomador.endereco }}</td>
+    <td class="k">CNPJ</td><td>{{ tomador.cnpj or "—" }}</td>
+  </tr>
+  <tr>
+    <td class="k">Emissão</td><td>{{ doc.emissao|data_pt }}</td>
+    <td class="k">Vencimento</td><td>{{ doc.vencimento|data_pt if doc.vencimento else "—" }}</td>
+    <td class="k">Moeda</td><td>{{ doc.moeda }}</td>
+  </tr>
+  <tr>
+    <td class="k">BL</td><td>{{ processo_refs.bl_master or "—" }}</td>
+    <td class="k">Navio</td><td>{{ processo_refs.navio or "—" }}{% if processo_refs.viagem %} {{ processo_refs.viagem }}{% endif %}</td>
+    <td class="k">Ref. cliente</td><td>{{ processo_refs.ref_cliente or "—" }}</td>
+  </tr>
+  <tr>
+    <td class="k">Contêineres</td><td colspan="5" class="mono">{{ processo_refs.conteineres|join("  ") or "—" }}</td>
+  </tr>
+</table>
+<div class="espaco"></div>
+
+<table class="grade">
+  <thead>
+    <tr>
+      <th>Item</th><th>Descrição</th><th>Entrada</th><th>Saída</th><th>Dias</th>
+      <th>Base CIF</th><th>%</th><th>Qtd</th><th>Unit.</th><th>Valor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for l in linhas %}
+    <tr class="{{ 'alt' if loop.index is even else '' }}">
+      <td class="num">{{ loop.index }}</td>
+      <td>{{ l.descricao }}{% for r in l.refs_linha %}<br><span class="small muted">{{ r }}</span>{% endfor %}</td>
+      {% if l.periodo %}
+      <td>{{ l.periodo[0]|data_pt }}</td>
+      <td>{{ l.periodo[1]|data_pt }}</td>
+      <td class="num">{{ (l.periodo[1] - l.periodo[0]).days }}</td>
+      {% else %}
+      <td>—</td><td>—</td><td class="num">—</td>
+      {% endif %}
+      <td class="num">{{ l.base_cif|num_pt if l.base_cif is not none else "—" }}</td>
+      <td class="num">{{ l.percentual|num_pt if l.percentual is not none else "—" }}</td>
+      <td class="num">{{ l.qtd|qtd_pt }}</td>
+      <td class="num">{{ l.valor_unit|num_pt }}</td>
+      <td class="num">{{ l.valor|num_pt }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="tot">
+      <td colspan="9" class="num">TOTAL ({{ doc.moeda }})</td>
+      <td class="num">{{ doc.total|dinheiro_pt(doc.moeda) }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{% if doc.observacoes %}<div class="obs">{{ doc.observacoes }}</div>{% endif %}
+{% endblock %}

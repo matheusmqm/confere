@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
-.PHONY: help install db migrate dev test test-db lint fmt seed eval demo-reset check-db
+.PHONY: help install db migrate dev test test-db lint fmt seed eval demo-reset check-db cache-stats
 
 help: ## Lista os alvos disponíveis
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "} {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
@@ -56,3 +56,7 @@ demo-reset: ## Reseta o estado da demo na API local
 check-db: ## Verifica a conexão e as extensões do banco (script da CF-6)
 	@test -f infra/scripts/check-db.sh || { echo "ERRO: infra/scripts/check-db.sh não existe (CF-6 ainda não está no repositório)."; exit 1; }
 	bash infra/scripts/check-db.sh
+
+cache-stats: ## Conta os arquivos e o tamanho do cache do LLM (data/llm_cache)
+	@echo "arquivos: $$(find data/llm_cache -type f -name '*.json' | wc -l)"
+	@echo "tamanho:  $$(du -sh data/llm_cache | cut -f1)"

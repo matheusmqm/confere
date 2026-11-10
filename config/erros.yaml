@@ -1,0 +1,11 @@
+# Taxonomia de erros injetados nos documentos sintéticos (CF-36).
+#
+# `taxa` é a fração das unidades afetadas; o gerador usa cota (arredondada, com no mínimo 1 quando
+# há unidades elegíveis), não sorteio, para o dataset ficar estável entre sementes.
+# `unidade`: linha | fatura | fatura_brl_convertida | pdf
+valor_acima:        {taxa: 0.06, unidade: linha,   fator_min: 1.05, fator_max: 1.40}
+duplicada:          {taxa: 0.02, unidade: fatura}
+taxa_nao_prevista:  {taxa: 0.04, unidade: fatura, descricoes: ["Documentation fee", "Taxa administrativa", "Handling fee", "Taxa de emissão de documento"], valor_min_brl: 80, valor_max_brl: 450}
+cambio_errado:      {taxa: 0.03, unidade: fatura_brl_convertida, desvio_min: 0.02, desvio_max: 0.05}
+referencia_cruzada: {taxa: 0.02, unidade: fatura}
+ruido_visual:       {taxa: 0.15, unidade: pdf}   # aplicado pela CF-37 (confere_synth.ruido)

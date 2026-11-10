@@ -1,0 +1,37 @@
+# Moedas (ISO 4217) aceitas na extração de faturas (CF-51): as ~30 mais comuns no comércio
+# exterior brasileiro. Moeda fora desta lista vira a falha grave `moeda_desconhecida`.
+moedas:
+  - BRL  # real
+  - USD  # dólar dos EUA
+  - EUR  # euro
+  - GBP  # libra esterlina
+  - CNY  # yuan renminbi
+  - JPY  # iene
+  - CHF  # franco suíço
+  - CAD  # dólar canadense
+  - AUD  # dólar australiano
+  - NZD  # dólar neozelandês
+  - SEK  # coroa sueca
+  - NOK  # coroa norueguesa
+  - DKK  # coroa dinamarquesa
+  - PLN  # zloty
+  - CZK  # coroa tcheca
+  - TRY  # lira turca
+  - SGD  # dólar de Singapura
+  - HKD  # dólar de Hong Kong
+  - TWD  # novo dólar taiwanês
+  - KRW  # won
+  - INR  # rupia indiana
+  - THB  # baht
+  - VND  # dong
+  - MYR  # ringgit
+  - IDR  # rupia indonésia
+  - AED  # dirham dos Emirados
+  - SAR  # riyal saudita
+  - ZAR  # rand
+  - MXN  # peso mexicano
+  - ARS  # peso argentino
+  - CLP  # peso chileno
+  - COP  # peso colombiano
+  - PEN  # sol peruano
+  - UYU  # peso uruguaio

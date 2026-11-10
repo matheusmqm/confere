@@ -5,6 +5,7 @@ description = "Gerador do mundo sintético do Confere."
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "confere-core",
+    "pyyaml>=6.0",
     "nfelib>=3.0",
     "brazilfiscalreport>=1.0",
     "weasyprint>=66",

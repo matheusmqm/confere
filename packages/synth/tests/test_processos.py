@@ -176,7 +176,8 @@ def test_todos_os_tipos_de_fornecedor_aparecem(
 
 def test_bl_master(processos: list[Processo], forn: dict[str, Fornecedor]) -> None:
     prefixos = {"atlantida-ocean-lines": "ATLX", "boreal-container-line": "BORX",
-                "tarquin-marine-lines": "TARX"}  # fmt: skip
+                "tarquin-marine-lines": "TARX",
+                "consolidadora-aurora": "CONX"}  # fmt: skip
     for p in processos:
         masters = refs(p, "bl_master")
         if p.modal == "maritimo":
@@ -232,8 +233,8 @@ def test_novo_regera_em_colisao() -> None:
 
 
 def test_mundo_completo(mundo: Mundo) -> None:
-    assert (len(mundo.fornecedores), len(mundo.clientes), len(mundo.processos)) == (14, 12, 50)
-    assert mundo.provisoes == [] and mundo.seed == 42
+    assert (len(mundo.fornecedores), len(mundo.clientes), len(mundo.processos)) == (15, 12, 50)
+    assert len(mundo.provisoes) > 400 and mundo.seed == 42
 
 
 def test_determinismo(catalogo: Catalogo) -> None:
