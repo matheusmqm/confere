@@ -8,6 +8,7 @@ from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 RAIZ = Path(__file__).resolve().parents[4]
+SEGREDO_SESSAO_PADRAO = "dev-somente-local-troque-em-producao"
 URL_LOCAL = "postgresql+psycopg://confere:confere@localhost:5432/confere"
 
 
@@ -36,10 +37,16 @@ class Settings(BaseSettings):
     llm_cache_dir: str = "data/llm_cache"
     llm_offline: bool = False
 
+    session_secret: SecretStr = SecretStr(SEGREDO_SESSAO_PADRAO)
     demo_mode: bool = False
     ptax_offline: bool = False
     next_public_api_url: str = "http://localhost:8000"
     sentry_dsn: str = ""
+
+    def _segredo_de_sessao_informado(self) -> str:
+        """Em `demo` o segredo padrão de desenvolvimento não vale: exige um valor próprio."""
+        valor = self.session_secret.get_secret_value()
+        return "" if valor in ("", SEGREDO_SESSAO_PADRAO) else valor
 
     @model_validator(mode="after")
     def _exigir_chaves_na_demo(self) -> "Settings":
@@ -52,6 +59,7 @@ class Settings(BaseSettings):
             "S3_ACCESS_KEY_ID": self.s3_access_key_id.get_secret_value(),
             "S3_SECRET_ACCESS_KEY": self.s3_secret_access_key.get_secret_value(),
             "GEMINI_API_KEY": self.gemini_api_key.get_secret_value(),
+            "SESSION_SECRET": self._segredo_de_sessao_informado(),
         }
         faltantes = [nome for nome, valor in valores.items() if not valor.strip()]
         if faltantes:
