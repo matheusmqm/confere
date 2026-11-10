@@ -56,7 +56,12 @@ from confere_core.ingest import classificar
 from confere_core.ingest.classificar_xml import classificar_xml
 from confere_core.ingest.render import renderizar
 from confere_core.llm.cache import CacheLLM
-from confere_core.llm.client import GeminiClient, LLMClient, RegistroChamada
+from confere_core.llm.client import (
+    GeminiClient,
+    LLMClient,
+    OpenRouterClient,
+    RegistroChamada,
+)
 from confere_core.match.guloso import LinhaParaCasar, ProvisaoParaCasar, casar_guloso
 from confere_core.resolve.normalizar import normalizar_referencia
 from confere_core.rules import ContextoRegras, aplicar_regras
@@ -141,9 +146,12 @@ def _excecao(
 
 def _cliente_llm(ctx: Ctx) -> LLMClient:
     settings = get_settings()
-    chave = settings.gemini_api_key.get_secret_value()
+    openrouter = settings.llm_provider == "openrouter"
+    segredo = settings.openrouter_api_key if openrouter else settings.gemini_api_key
+    chave = segredo.get_secret_value()
     if not chave:
-        raise ErroPipeline("Ler PDF e imagem exige GEMINI_API_KEY no .env (XML não exige).")
+        nome = "OPENROUTER_API_KEY" if openrouter else "GEMINI_API_KEY"
+        raise ErroPipeline(f"Ler PDF e imagem exige {nome} no .env (XML não exige).")
 
     def registrar(chamada: RegistroChamada) -> None:
         ctx.db.add(
@@ -162,6 +170,15 @@ def _cliente_llm(ctx: Ctx) -> LLMClient:
             )
         )
 
+    if openrouter:
+        return OpenRouterClient(
+            api_key=chave,
+            model=settings.openrouter_model,
+            model_reserva=settings.openrouter_model_fallback,
+            cache=CacheLLM(RAIZ / settings.llm_cache_dir),
+            offline=settings.llm_offline,
+            on_chamada=registrar,
+        )
     return GeminiClient(
         api_key=chave,
         model=settings.gemini_model,

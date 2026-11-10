@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     gemini_api_key: SecretStr = SecretStr("")
     gemini_model: str = "gemini-flash-latest"
     gemini_embed_model: str = "gemini-embedding-001"
+    llm_provider: Literal["gemini", "openrouter"] = "gemini"
+    openrouter_api_key: SecretStr = SecretStr("")
+    openrouter_model: str = "nvidia/nemotron-3.5-super-vl:free"
+    openrouter_model_fallback: str = "google/gemma-4-31b-it:free"
     llm_cache_dir: str = "data/llm_cache"
     llm_offline: bool = False
 
@@ -58,9 +62,12 @@ class Settings(BaseSettings):
             "S3_REGION": self.s3_region,
             "S3_ACCESS_KEY_ID": self.s3_access_key_id.get_secret_value(),
             "S3_SECRET_ACCESS_KEY": self.s3_secret_access_key.get_secret_value(),
-            "GEMINI_API_KEY": self.gemini_api_key.get_secret_value(),
             "SESSION_SECRET": self._segredo_de_sessao_informado(),
         }
+        if self.llm_provider == "openrouter":
+            valores["OPENROUTER_API_KEY"] = self.openrouter_api_key.get_secret_value()
+        else:
+            valores["GEMINI_API_KEY"] = self.gemini_api_key.get_secret_value()
         faltantes = [nome for nome, valor in valores.items() if not valor.strip()]
         if faltantes:
             raise ValueError("ENV=demo exige variáveis não definidas: " + ", ".join(faltantes))

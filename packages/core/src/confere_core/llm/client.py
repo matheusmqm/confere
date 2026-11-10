@@ -285,6 +285,182 @@ class GeminiClient:
         return vetores
 
 
+# ---------------------------------------------------------------- openrouter
+
+URL_OPENROUTER = "https://openrouter.ai/api/v1/chat/completions"
+
+
+class ErroOpenRouter(Exception):  # noqa: N818  (nome definido pela tarefa)
+    """A API do OpenRouter respondeu com erro (limite de uso, modelo fora do ar, chave)."""
+
+
+def _extrair_json(texto: str) -> str:
+    """Tira cercas ```json e texto em volta: modelos free nem sempre devolvem JSON puro."""
+    limpo = texto.strip()
+    if limpo.startswith("```"):
+        limpo = limpo.split("\n", 1)[1] if "\n" in limpo else ""
+        limpo = limpo.rsplit("```", 1)[0]
+    inicio, fim = limpo.find("{"), limpo.rfind("}")
+    return limpo[inicio : fim + 1] if inicio != -1 and fim > inicio else limpo
+
+
+class OpenRouterClient:
+    """LLM via OpenRouter (API compatível com OpenAI). Serve para os modelos free.
+
+    Saída presa ao schema: `response_format=json_schema` (não estrito) e o schema também vai no
+    prompt de sistema, porque nem todo modelo free respeita o `response_format`. A validação final
+    é sempre do Pydantic. `modelo_reserva` entra pela lista `models` do OpenRouter.
+    """
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        model_reserva: str = "",
+        precos: TabelaPrecos | None = None,
+        on_chamada: HookChamada | None = None,
+        client: Any | None = None,
+        cache: CacheLLM | None = None,
+        offline: bool = False,
+        timeout_s: float = 120.0,
+    ) -> None:
+        if client is None:
+            import httpx
+
+            client = httpx.Client(timeout=timeout_s)
+        self._http: Any = client
+        self._api_key = api_key
+        self._model = model
+        self._reserva = model_reserva
+        self._precos = precos or TabelaPrecos.carregar()
+        self._on_chamada = on_chamada
+        self._cache = cache
+        self._offline = offline
+
+    def _pedir(
+        self, *, sistema: str, pedido: str, imagens: list[bytes], schema: type[BaseModel]
+    ) -> tuple[str, str, int, int]:
+        import base64
+
+        conteudo: list[dict[str, Any]] = [{"type": "text", "text": pedido}]
+        for img in imagens:
+            b64 = base64.b64encode(img).decode()
+            conteudo.append(
+                {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}}
+            )
+        esquema = schema.model_json_schema()
+        corpo: dict[str, Any] = {
+            "model": self._model,
+            "temperature": 0,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": f"{sistema}\n\nResponda SOMENTE com um objeto JSON válido para "
+                    f"este JSON Schema, sem texto extra:\n{esquema}",
+                },
+                {"role": "user", "content": conteudo},
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": schema.__name__, "schema": esquema, "strict": False},
+            },
+        }
+        if self._reserva:
+            corpo["models"] = [self._model, self._reserva]
+        resposta = self._http.post(
+            URL_OPENROUTER,
+            json=corpo,
+            headers={"Authorization": f"Bearer {self._api_key}"},
+        )
+        if resposta.status_code >= 400:
+            raise ErroOpenRouter(f"HTTP {resposta.status_code}: {resposta.text[:300]}")
+        corpo_resp = resposta.json()
+        if "error" in corpo_resp:
+            raise ErroOpenRouter(str(corpo_resp["error"])[:300])
+        texto = corpo_resp["choices"][0]["message"].get("content") or ""
+        uso = corpo_resp.get("usage") or {}
+        return (
+            texto,
+            str(corpo_resp.get("model") or self._model),
+            int(uso.get("prompt_tokens") or 0),
+            int(uso.get("completion_tokens") or 0),
+        )
+
+    def gerar_estruturado[T: BaseModel](
+        self,
+        *,
+        etapa: str,
+        prompt_id: str,
+        prompt_versao: int,
+        texto: str,
+        imagens: list[bytes],
+        schema: type[T],
+        chave_cache: str | None = None,
+    ) -> RespostaLLM[T]:
+        em_cache = _resposta_do_cache(
+            cache=self._cache, offline=self._offline, etapa=etapa, prompt_id=prompt_id,
+            prompt_versao=prompt_versao, modelo=self._model, chave_cache=chave_cache,
+            schema=schema, on_chamada=self._on_chamada,
+        )  # fmt: skip
+        if em_cache is not None:
+            return em_cache
+
+        sistema = carregar_prompt(prompt_id, prompt_versao)
+        inicio = time.perf_counter()
+        tokens_in = tokens_out = 0
+        erro = ""
+        dados: T | None = None
+        usado = self._model
+        tentativas = 0
+        for tentativas in (1, 2):
+            pedido = texto if tentativas == 1 else (
+                f"{texto}\n\n[CORREÇÃO] Sua resposta anterior não respeitou o schema: {erro}. "
+                "Responda de novo, somente com JSON válido para o schema."
+            )  # fmt: skip
+            try:
+                bruto, usado, t_in, t_out = self._pedir(
+                    sistema=sistema, pedido=pedido, imagens=imagens, schema=schema
+                )
+            except ErroOpenRouter as e:
+                erro = str(e)
+                break
+            tokens_in, tokens_out = tokens_in + t_in, tokens_out + t_out
+            try:
+                dados = schema.model_validate_json(_extrair_json(bruto))
+                break
+            except (ValidationError, ValueError) as e:
+                erro = str(e)[:500]
+        latencia = round((time.perf_counter() - inicio) * 1000)
+        custo = calcular_custo_usd(self._precos, usado, tokens_in, tokens_out)
+
+        if self._on_chamada is not None:
+            self._on_chamada(
+                RegistroChamada(
+                    etapa=etapa, prompt_id=prompt_id, prompt_versao=prompt_versao,
+                    modelo=usado, tokens_in=tokens_in, tokens_out=tokens_out,
+                    latencia_ms=latencia, cache_hit=False, custo_usd=custo,
+                    chave_cache=chave_cache, tentativas=tentativas,
+                    sucesso=dados is not None, erro=None if dados is not None else erro,
+                )
+            )  # fmt: skip
+        if dados is None:
+            raise SaidaInvalidaLLM(f"{prompt_id} v{prompt_versao}: saída inválida: {erro}")
+        _gravar_no_cache(
+            self._cache, chave_cache, prompt_id, prompt_versao, self._model, dados,
+            tokens_in, tokens_out,
+        )  # fmt: skip
+        return RespostaLLM[T](
+            dados=dados, modelo=usado, tokens_in=tokens_in, tokens_out=tokens_out,
+            latencia_ms=latencia, cache_hit=False, custo_usd=custo,
+        )  # fmt: skip
+
+    def embed(self, textos: list[str]) -> list[list[float]]:
+        raise NotImplementedError(
+            "OpenRouter free não oferece embeddings; use LLM_PROVIDER=gemini para a busca vetorial."
+        )
+
+
 # ---------------------------------------------------------------------- fake
 
 
