@@ -1,0 +1,16 @@
+# Preço por MILHÃO de tokens, em USD, usado só para estimar `custo_usd` das chamadas ao LLM.
+#
+# ATENÇÃO: estes valores são de REFERÊNCIA e podem estar desatualizados.
+# Conferir o preço vigente no site do provedor antes de citar custo em relatório ou pitch.
+moeda: USD
+modelos:
+  gemini-flash-latest:  # conferir preço vigente
+    entrada_usd_por_milhao: 0.30
+    saida_usd_por_milhao: 2.50
+  gemini-embedding-001:  # conferir preço vigente
+    entrada_usd_por_milhao: 0.15
+    saida_usd_por_milhao: 0
+# Usado quando o modelo não está listado acima.
+padrao:  # conferir preço vigente
+  entrada_usd_por_milhao: 0.30
+  saida_usd_por_milhao: 2.50
