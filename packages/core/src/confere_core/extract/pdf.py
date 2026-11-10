@@ -83,9 +83,7 @@ def achar_valor(texto: str, valor: Decimal) -> bool:
 # ------------------------------------------------------------------ refino de bbox
 
 
-def _normalizar(
-    caixa: tuple[float, float, float, float], pagina: PaginaRenderizada
-) -> BBox:
+def _normalizar(caixa: tuple[float, float, float, float], pagina: PaginaRenderizada) -> BBox:
     def lim(x: float) -> float:
         return min(max(x, 0.0), 1.0)
 
@@ -148,9 +146,7 @@ def _refinar_bbox(
     )
 
 
-def refinar_e_pontuar(
-    fatura: FaturaExtraida, paginas: list[PaginaRenderizada]
-) -> FaturaExtraida:
+def refinar_e_pontuar(fatura: FaturaExtraida, paginas: list[PaginaRenderizada]) -> FaturaExtraida:
     """Substitui bbox pela real (quando há texto) e fixa a confiança inicial de cada linha."""
     usados: set[tuple[int, int]] = set()
     linhas: list[LinhaExtraida] = []
@@ -325,7 +321,9 @@ def extrair_com_verificacao(
 
     usar_segunda_como_base = not v2.falhas  # a segunda passou e a primeira não
     (base, v_base), (outra, v_outra) = (
-        ((v2.fatura, v2), (v1.fatura, v1)) if usar_segunda_como_base else ((v1.fatura, v1), (v2.fatura, v2))
+        ((v2.fatura, v2), (v1.fatura, v1))
+        if usar_segunda_como_base
+        else ((v1.fatura, v1), (v2.fatura, v2))
     )
     # valor de campo divergente: o da extração que passa na soma; se nenhuma passa, a primeira
     if _soma_ok(v_base):

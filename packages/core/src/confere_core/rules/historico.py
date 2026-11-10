@@ -50,7 +50,12 @@ class HistoricoMemoria:
     ) -> None:
         self._documentos.append(
             _Documento(
-                empresa_id, documento_id, fornecedor_id, normalizar_numero(numero), sha256, cancelado
+                empresa_id,
+                documento_id,
+                fornecedor_id,
+                normalizar_numero(numero),
+                sha256,
+                cancelado,
             )
         )
 

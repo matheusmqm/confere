@@ -32,9 +32,7 @@ class FonteSinonimos(Protocol):
         """Sinônimos do texto: os do fornecedor e os globais."""
         ...
 
-    def gravar(
-        self, texto_norm: str, fornecedor_id: str | None, codigo: str, origem: str
-    ) -> None:
+    def gravar(self, texto_norm: str, fornecedor_id: str | None, codigo: str, origem: str) -> None:
         """Grava (upsert por fornecedor e texto): um código por texto em cada nível."""
         ...
 
@@ -72,7 +70,9 @@ def classificar_por_dicionario(
         )
         if resultado is not None or conflito:
             return resultado
-    resultado, _ = _decidir([s for s in encontrados if s.fornecedor_id is None], texto_norm, "global")
+    resultado, _ = _decidir(
+        [s for s in encontrados if s.fornecedor_id is None], texto_norm, "global"
+    )
     return resultado
 
 
@@ -128,9 +128,7 @@ class FonteSinonimosMemoria:
             achados += self._itens.get((fornecedor_id, texto_norm), [])
         return achados
 
-    def gravar(
-        self, texto_norm: str, fornecedor_id: str | None, codigo: str, origem: str
-    ) -> None:
+    def gravar(self, texto_norm: str, fornecedor_id: str | None, codigo: str, origem: str) -> None:
         """Upsert: substitui o que havia para (fornecedor, texto)."""
         self._itens[(fornecedor_id, texto_norm)] = [
             Sinonimo(
