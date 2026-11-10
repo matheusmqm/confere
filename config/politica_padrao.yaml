@@ -1,0 +1,7 @@
+# Política padrão de uma empresa nova (copiada para `empresa.politica_json`).
+# Valores monetários e proporções entre aspas: lidos como texto e convertidos para Decimal.
+tol_abs_brl: "50.00"        # tolerância absoluta, em R$
+tol_rel: "0.03"             # tolerância relativa ao valor previsto
+alpha: "0.01"               # risco máximo de aprovar uma cobrança errada (E8)
+data_cambio: emissao        # data da PTAX: emissao | vencimento | recebimento
+limite_cambio_rel: "0.015"  # diferença máxima entre o câmbio cobrado e a PTAX
