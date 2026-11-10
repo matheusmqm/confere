@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+dist/
+coverage/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Armazenamento local
+.storage/
+
+# Sistema
+.DS_Store
+
+# Testes E2E
+playwright-report/
+test-results/
