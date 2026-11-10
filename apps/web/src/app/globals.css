@@ -4,7 +4,43 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Tokens de design do Confere (CF-119). Fonte: sistema de design "Confere" (identidade), arquivo
+ * tokens.json. A identidade é só no tema claro; os valores de `.dark` abaixo são DERIVADOS dela
+ * (mesmas funções de cor, contraste recalculado) para a CF-135 e devem ser revisados no Design.
+ *
+ * Tailwind v4 usa configuração em CSS (`@theme`), por isso não há tailwind.config.ts. Os valores
+ * hexadecimais vivem só aqui: nos `.tsx` o ESLint proíbe literais `#rrggbb` (use as classes).
+ */
+
 @theme inline {
+  /* Paleta da identidade. `tinta`, `papel` e a escala `tinta/80…10` vêm de opacidade (ex.: bg-tinta/20). */
+  --color-tinta: var(--tinta-900);
+  --color-tinta-900: var(--tinta-900);
+  --color-tinta-700: var(--tinta-700);
+  --color-tinta-500: var(--tinta-500);
+  --color-tinta-300: var(--tinta-300);
+  --color-tinta-100: var(--tinta-100);
+  --color-papel: var(--papel-50);
+  --color-papel-50: var(--papel-50);
+  --color-branco: var(--branco);
+  --color-verde-conferido: var(--verde-conferido);
+  --color-verde-texto: var(--verde-texto);
+  --color-verde-fundo: var(--verde-fundo);
+  --color-cobalto: var(--cobalto);
+  --color-cobalto-texto: var(--cobalto-texto);
+  --color-cobalto-fundo: var(--cobalto-fundo);
+  --color-ambar: var(--ambar);
+  --color-ambar-texto: var(--ambar-texto);
+  --color-ambar-fundo: var(--ambar-fundo);
+  --color-vermelho: var(--vermelho);
+  --color-vermelho-texto: var(--vermelho-texto);
+  --color-vermelho-fundo: var(--vermelho-fundo);
+  --color-roxo-ia: var(--roxo-ia);
+  --color-roxo-texto: var(--roxo-texto);
+  --color-roxo-fundo: var(--roxo-fundo);
+
+  /* Semânticas (shadcn) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -39,82 +75,125 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Raios: identidade define sm 6 px e lg 10 px; md fica no meio. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 22px;
+  --radius-4xl: 26px;
+
+  /* Sombras: cartões e painéis só com borda; popovers e menus com a sombra flutuante. */
+  --shadow-cartao: var(--sombra-cartao);
+  --shadow-popover: var(--sombra-popover);
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --tinta-900: #0e1b2c;
+  --tinta-700: #2a3a50;
+  --tinta-500: #5b6b80;
+  --tinta-300: #a7b2c1;
+  --tinta-100: #e3e8ef;
+  --papel-50: #f7f5f0;
+  --branco: #ffffff;
+  --verde-conferido: #1f9d55;
+  --verde-texto: #157a42;
+  --verde-fundo: #e6f4ec;
+  --cobalto: #2f5bea;
+  --cobalto-texto: #2448c4;
+  --cobalto-fundo: #e8eefd;
+  --ambar: #e8a33d;
+  --ambar-texto: #9a6412;
+  --ambar-fundo: #fcf1de;
+  --vermelho: #d64545;
+  --vermelho-texto: #b3302f;
+  --vermelho-fundo: #fbe7e7;
+  --roxo-ia: #7c5ce0;
+  --roxo-texto: #5a3dbf;
+  --roxo-fundo: #efeafb;
+
+  --sombra-cartao: 0 1px 0 rgb(14 27 44 / 0.03);
+  --sombra-popover: 0 4px 16px rgb(14 27 44 / 0.08);
+
+  --background: var(--branco);
+  --foreground: var(--tinta-900);
+  --card: var(--branco);
+  --card-foreground: var(--tinta-900);
+  --popover: var(--branco);
+  --popover-foreground: var(--tinta-900);
+  --primary: var(--cobalto);
+  --primary-foreground: var(--branco);
+  --secondary: var(--papel-50);
+  --secondary-foreground: var(--tinta-900);
+  --muted: var(--papel-50);
+  --muted-foreground: var(--tinta-500);
+  --accent: var(--cobalto-fundo);
+  --accent-foreground: var(--cobalto-texto);
+  --destructive: var(--vermelho-texto);
+  --border: var(--tinta-100);
+  --input: var(--tinta-300);
+  --ring: var(--cobalto);
+  --chart-1: var(--cobalto);
+  --chart-2: var(--verde-conferido);
+  --chart-3: var(--ambar);
+  --chart-4: var(--roxo-ia);
+  --chart-5: var(--tinta-500);
+  --radius: 10px;
+  --sidebar: var(--papel-50);
+  --sidebar-foreground: var(--tinta-700);
+  --sidebar-primary: var(--cobalto);
+  --sidebar-primary-foreground: var(--branco);
+  --sidebar-accent: var(--tinta-100);
+  --sidebar-accent-foreground: var(--tinta-900);
+  --sidebar-border: var(--tinta-100);
+  --sidebar-ring: var(--cobalto);
 }
 
+/* Tema escuro derivado da identidade (CF-135): confirmar com o Design. */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --tinta-900: #eef2f7;
+  --tinta-700: #c9d3df;
+  --tinta-500: #9aa8ba;
+  --tinta-300: #46586f;
+  --tinta-100: #223247;
+  --papel-50: #131d2b;
+  --branco: #0b1522;
+  --verde-conferido: #2fb86a;
+  --verde-texto: #5fd08c;
+  --verde-fundo: #123524;
+  --cobalto: #5b82f2;
+  --cobalto-texto: #8faaf7;
+  --cobalto-fundo: #172447;
+  --ambar: #e8a33d;
+  --ambar-texto: #f0be6a;
+  --ambar-fundo: #3a2a10;
+  --vermelho: #e06060;
+  --vermelho-texto: #f08a89;
+  --vermelho-fundo: #3c1a1a;
+  --roxo-ia: #9a80ec;
+  --roxo-texto: #b7a2f2;
+  --roxo-fundo: #2a2146;
+
+  --sombra-cartao: none;
+  --sombra-popover: 0 4px 16px rgb(0 0 0 / 0.4);
+
+  --primary-foreground: #0b1522;
+  --destructive: var(--vermelho-texto);
+}
+
+@utility rotulo {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@utility valor {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 @layer base {
