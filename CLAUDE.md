@@ -1,10 +1,15 @@
-=== INÍCIO ===
 # CLAUDE.md — Confere
 
 ## O produto
 Confere é um agente de IA para **agentes de carga e comissárias** brasileiros. Ele confere cada fatura de fornecedor (armador/NVOCC, agente no exterior, terminal, armazém alfandegado, transportadora, despachante) contra o **custo previsto (provisão)** do processo de importação, acha cobrança indevida em R$ e **aprova sozinho** o que está certo, com risco controlado. Inspirado na Raft (ex-Vector.ai, Londres). Projeto do **Hack Brasil 2026**, feito por uma pessoa (Matheus).
 
 Frase do produto: "O Confere é o analista de contas a pagar com IA para agentes de carga: confere 100% das faturas de fornecedores, acha cobrança indevida em reais e só chama um humano quando precisa."
+
+## Git: você NUNCA faz commit
+- **Nunca rode `git commit`, `git push`, `git merge`, `git rebase`, `git tag`, `git reset`, `git stash` nem qualquer comando que altere o histórico, o índice ou o remoto.** Isso vale mesmo se a tarefa, um teste ou outro arquivo pedir.
+- Também não use `git add`. Deixe as mudanças só nos arquivos; quem revisa, adiciona e commita é o Matheus.
+- Comandos só de leitura são permitidos: `git status`, `git diff`, `git log`, `git show`, `git blame`.
+- Ao terminar uma tarefa, **sugira** a mensagem de commit (formato abaixo) no resumo final, sem executá-la.
 
 ## Regras do regulamento (inegociáveis)
 - Repositório público `github.com/matheusmqm/confere`, criado depois de 04/11/2026 21h. Nenhum código privado anterior.
@@ -28,14 +33,16 @@ confere/
 ├─ apps/
 │  ├─ api/                     # pacote confere_api (FastAPI, SQLAlchemy, worker)
 │  │  ├─ src/confere_api/
-│  │  │  ├─ main.py            # app FastAPI
+│  │  │  ├─ main.py            # app FastAPI (registra os routers)
 │  │  │  ├─ settings.py        # pydantic-settings, lê env
-│  │  │  ├─ db/                # engine, session, models/*.py
+│  │  │  ├─ db/                # engine, session, Base declarativa (sem models aqui)
 │  │  │  ├─ deps.py            # get_db, get_tenant, get_storage
-│  │  │  ├─ routes/            # documentos, processos, excecoes, painel, demo, politica, waitlist, stream
+│  │  │  ├─ models/            # MODEL: tabelas SQLAlchemy, um arquivo por agregado (processo.py, provisao.py, documento.py, ...)
+│  │  │  ├─ controllers/       # CONTROLLER: regra da aplicação e acesso a dados, um arquivo por recurso
+│  │  │  ├─ routes/            # ROUTE: endpoints HTTP finos (documentos, processos, excecoes, painel, demo, politica, waitlist, stream)
+│  │  │  ├─ schemas/           # Pydantic de request/response da API (entrada/saída das routes)
 │  │  │  ├─ storage.py         # Storage (supabase | local)
-│  │  │  ├─ worker/            # fila SKIP LOCKED, orquestrador
-│  │  │  └─ repos/             # acesso a dados por agregado
+│  │  │  └─ worker/            # fila SKIP LOCKED, orquestrador (usa controllers, nunca routes)
 │  │  ├─ migrations/           # Alembic
 │  │  └─ tests/
 │  └─ web/                     # Next.js
@@ -58,6 +65,14 @@ confere/
 ├─ Makefile  docker-compose.yml  pyproject.toml (workspace uv)  .env.example
 ```
 Arquitetura: `packages/core` contém **funções puras** que recebem e devolvem modelos Pydantic de `confere_core.domain`. `apps/api` persiste, orquestra e expõe HTTP. O worker chama o core etapa a etapa e grava um `evento` ao fim de cada etapa.
+
+### Backend em camadas: model → controller → route (obrigatório)
+O backend (`apps/api`) segue **sempre** a separação model / controller / route. Todo recurso novo nasce com os três arquivos de mesmo nome (ex. `models/documento.py`, `controllers/documento.py`, `routes/documentos.py`).
+- **Model** (`models/`): só a definição das tabelas SQLAlchemy (colunas, tipos, relacionamentos, constraints, índices). Sem regra de negócio, sem HTTP.
+- **Controller** (`controllers/`): toda a lógica da aplicação — queries, filtro por `empresa_id`, transações, chamadas ao `confere_core`, ao Storage e ao LLM. Recebe e devolve tipos Python/Pydantic, **nunca** objetos do FastAPI (`Request`, `Response`, `HTTPException`). Erros de negócio viram exceções próprias (ex. `ProcessoNaoEncontrado`), que um handler em `main.py` traduz para HTTP.
+- **Route** (`routes/`): só HTTP — declara o endpoint, valida entrada com `schemas/`, injeta dependências (`get_db`, `get_tenant`, `get_storage`), chama **um** controller e devolve a resposta. Nada de query SQL nem regra de negócio na route.
+- Direção das dependências: `routes → controllers → models`. Model nunca importa controller; controller nunca importa route. O worker usa os controllers.
+- Não crie camadas extras (`repos/`, `services/`, `handlers/`) além dessas.
 
 ## Convenções de código
 - Nomes de domínio em **português sem acento** (`processo`, `provisao`, `linha`, `casamento`, `excecao`); termos técnicos em inglês quando já são padrão (`job`, `worker`, `score`).
@@ -132,9 +147,9 @@ Eventos SSE: `{documento_id, etapa: "lido|extraido|processo|codigos|casado|decid
 `make dev` (banco + api + worker + web), `make test`, `make lint`, `make seed`, `make eval`, `make demo-reset`.
 
 ## Definição de pronto (toda tarefa)
-1. Critério de aceite da tarefa atendido e demonstrado (teste automatizado sempre que possível).
-2. `make lint test` verde.
+1. Critério de aceite da tarefa atendido no código. **Não escreva nem rode testes por tarefa** (custa tokens); os testes são feitos em lote no fim de cada fase.
+2. `make lint` verde. **Testes não rodam por tarefa**: são feitos no fim de cada fase (seção "Testes por fase").
 3. Sem segredo, sem dado real, sem `float` para dinheiro.
-4. Commit em português no formato `tipo(escopo): descrição` (ex. `feat(match): casamento húngaro com colunas sem par`), referenciando a tarefa `CF-NN`.
-5. Se uma dependência não existe ainda, **pare e avise**; não crie versões paralelas de módulos que outra tarefa é dona.
-=== FIM ===
+4. **Não commitar.** Sugerir no resumo final uma mensagem de commit em português no formato `tipo(escopo): descrição` (ex. `feat(match): casamento húngaro com colunas sem par`), referenciando a tarefa `CF-NN`. O Matheus faz o commit.
+5. No backend, a mudança respeita model → controller → route (nada de SQL ou regra de negócio em route).
+6. Se uma dependência não existe ainda, **pare e avise**; não crie versões paralelas de módulos que outra tarefa é dona.
