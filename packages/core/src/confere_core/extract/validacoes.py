@@ -218,8 +218,7 @@ def validar(fatura: FaturaExtraida, contexto: ContextoValidacao) -> ResultadoVal
                     codigo="quantidade_x_unitario",
                     campo=f"linhas[{ln.ordem}].valor",
                     mensagem=(
-                        f"{ln.quantidade} x {ln.valor_unitario} difere de {ln.valor} "
-                        f"em {diferenca}"
+                        f"{ln.quantidade} x {ln.valor_unitario} difere de {ln.valor} em {diferenca}"
                     ),
                     grave=False,
                 )

@@ -32,3 +32,6 @@ test-results/
 
 # Pré-visualizações de faturas (CF-32)
 data/preview/
+
+# CT-e XML de teste (infra/scripts/gerar_ctes_demo.py)
+data/demo_xml/
