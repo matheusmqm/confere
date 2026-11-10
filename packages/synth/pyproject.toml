@@ -1,0 +1,21 @@
+[project]
+name = "confere-synth"
+version = "0.1.0"
+description = "Gerador do mundo sintético do Confere."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "confere-core",
+    "nfelib>=3.0",
+    "brazilfiscalreport>=1.0",
+    "weasyprint>=66",
+    "faker>=37",
+    "pillow>=11",
+    "jinja2>=3.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/confere_synth"]

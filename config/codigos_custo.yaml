@@ -1,0 +1,203 @@
+# Catálogo de códigos de custo de importação (E4). Termos genéricos do setor,
+# não de empresa específica. Sinônimos são comparados em minúsculas e sem acento
+# e não podem se repetir entre códigos.
+versao: 1
+grupos: [frete, origem, destino, armazenagem, governo, documentacao, rodoviario, despacho, outros]
+codigos:
+  # ---------------------------------------------------------------- frete
+  - codigo: FRETE_MAR
+    descricao: Frete marítimo internacional
+    grupo: frete
+    moeda_tipica: USD
+    unidade: por_conteiner
+    sinonimos: ["Ocean Freight", "Frete Marítimo", "Sea Freight", "O/F", "OFT", "Frete Internacional"]
+  - codigo: BAF
+    descricao: Ajuste de combustível (bunker)
+    grupo: frete
+    moeda_tipica: USD
+    unidade: por_conteiner
+    sinonimos: ["Bunker Adjustment Factor", "BAF", "Ajuste de Combustível", "Bunker Surcharge", "Taxa de Bunker"]
+  - codigo: CAF
+    descricao: Ajuste cambial sobre o frete
+    grupo: frete
+    moeda_tipica: USD
+    unidade: percentual
+    sinonimos: ["Currency Adjustment Factor", "CAF", "Ajuste Cambial", "Fator de Ajuste Cambial", "Currency Surcharge"]
+  - codigo: PSS
+    descricao: Sobretaxa de alta temporada
+    grupo: frete
+    moeda_tipica: USD
+    unidade: por_conteiner
+    sinonimos: ["Peak Season Surcharge", "PSS", "Sobretaxa de Alta Temporada", "Taxa de Alta Temporada", "Peak Season"]
+
+  # --------------------------------------------------------------- origem
+  - codigo: THC_ORIG
+    descricao: Movimentação no terminal de origem
+    grupo: origem
+    moeda_tipica: USD
+    unidade: por_conteiner
+    sinonimos: ["THC Orig", "Terminal Handling Charge - Origin", "OTHC", "Origin Terminal Handling", "Taxa de Manuseio na Origem", "THC Origem"]
+
+  # -------------------------------------------------------------- destino
+  - codigo: THC_DEST
+    descricao: Capatazia / movimentação no terminal de destino
+    grupo: destino
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["THC DEST", "Terminal Handling Charge - Destination", "Capatazia", "Taxa de movimentação destino", "DTHC", "THC Destino", "Destination Terminal Handling"]
+  - codigo: DESCONSOLIDACAO
+    descricao: Desconsolidação de carga LCL no destino
+    grupo: destino
+    moeda_tipica: BRL
+    unidade: por_bl
+    sinonimos: ["Desconsolidação", "Deconsolidation", "Deconsolidation Charge", "CFS Charge Destination", "Taxa de Desconsolidação", "Desova de Carga"]
+  - codigo: LIBERACAO_BL
+    descricao: Taxa de liberação do BL (release)
+    grupo: destino
+    moeda_tipica: BRL
+    unidade: por_bl
+    sinonimos: ["Release Fee", "Taxa de Liberação", "Liberação de BL", "BL Release Fee", "Telex Release", "Taxa de Release"]
+  - codigo: ISPS
+    descricao: Taxa de proteção portuária (código ISPS)
+    grupo: destino
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["ISPS", "ISPS Code", "ISPS Surcharge", "Taxa ISPS", "Port Facility Security Fee"]
+  - codigo: SCANNER
+    descricao: Escaneamento de contêiner no terminal
+    grupo: destino
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["Scanner", "Container Scanning", "Escaneamento de Contêiner", "Taxa de Scanner", "Inspeção por Scanner", "X-Ray Inspection"]
+
+  # ---------------------------------------------------------- armazenagem
+  - codigo: ARMAZENAGEM
+    descricao: Armazenagem alfandegada da carga
+    grupo: armazenagem
+    moeda_tipica: BRL
+    unidade: por_dia
+    sinonimos: ["Armazenagem", "Storage", "Storage Charge", "Warehousing", "Armazenagem Alfandegada", "Taxa de Armazenagem"]
+  - codigo: POSICIONAMENTO
+    descricao: Posicionamento do contêiner para vistoria ou desova
+    grupo: armazenagem
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["Posicionamento", "Positioning", "Container Positioning", "Posicionamento de Contêiner", "Taxa de Posicionamento"]
+  - codigo: LEVANTE
+    descricao: Levante / retirada do contêiner do terminal
+    grupo: armazenagem
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["Levante", "Taxa de Levante", "Lift Off", "Container Pickup Fee", "Retirada de Contêiner"]
+  - codigo: DEMURRAGE
+    descricao: Sobreestadia do contêiner além do período livre
+    grupo: armazenagem
+    moeda_tipica: USD
+    unidade: por_dia
+    sinonimos: ["Demurrage", "Sobreestadia", "Sobre-estadia", "DEM", "Container Demurrage", "Demurrage Charge"]
+  - codigo: DETENTION
+    descricao: Detenção do contêiner fora do terminal além do prazo
+    grupo: armazenagem
+    moeda_tipica: USD
+    unidade: por_dia
+    sinonimos: ["Detention", "DET", "Devolução Tardia", "Container Detention", "Detention Charge", "Taxa de Detenção"]
+  - codigo: LAVAGEM_CNTR
+    descricao: Lavagem / limpeza do contêiner na devolução
+    grupo: armazenagem
+    moeda_tipica: BRL
+    unidade: por_conteiner
+    sinonimos: ["Lavagem de Contêiner", "Container Washing", "Cleaning Fee", "Taxa de Limpeza", "Container Cleaning", "Lavagem"]
+
+  # -------------------------------------------------------------- governo
+  - codigo: AFRMM
+    descricao: Adicional ao Frete para Renovação da Marinha Mercante
+    grupo: governo
+    moeda_tipica: BRL
+    unidade: percentual
+    sinonimos: ["AFRMM", "Adicional ao Frete para Renovação da Marinha Mercante", "Merchant Marine Renewal Surcharge", "Adicional de Frete", "Merchant Marine Renewal Fee"]
+  - codigo: SISCOMEX
+    descricao: Taxa de utilização do Siscomex (registro da DI)
+    grupo: governo
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Siscomex", "Taxa Siscomex", "Taxa de Utilização do Siscomex", "Siscomex Fee", "Taxa de Registro de DI"]
+
+  # --------------------------------------------------------- documentacao
+  - codigo: BL_FEE
+    descricao: Emissão do conhecimento de embarque (BL)
+    grupo: documentacao
+    moeda_tipica: USD
+    unidade: por_bl
+    sinonimos: ["BL Fee", "Bill of Lading Fee", "Taxa de BL", "Emissão de BL", "B/L Fee", "BL Issuance Fee"]
+  - codigo: DOC_FEE_ORIG
+    descricao: Taxa de documentação na origem
+    grupo: documentacao
+    moeda_tipica: USD
+    unidade: por_bl
+    sinonimos: ["Documentation Fee Origin", "Doc Fee", "Taxa de Documentação Origem", "Origin Documentation Fee", "Documentation Fee"]
+  - codigo: CORRECAO_BL
+    descricao: Taxa de correção / retificação do BL
+    grupo: documentacao
+    moeda_tipica: USD
+    unidade: por_bl
+    sinonimos: ["Correção de BL", "BL Amendment", "Amendment Fee", "BL Correction Fee", "Taxa de Correção", "Taxa de Retificação de BL"]
+
+  # ----------------------------------------------------------- rodoviario
+  - codigo: FRETE_RODO
+    descricao: Frete rodoviário (porto ou terminal até o destino)
+    grupo: rodoviario
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Frete Rodoviário", "Transporte Rodoviário", "Trucking", "Road Freight", "Frete Terrestre", "Inland Haulage"]
+  - codigo: PEDAGIO
+    descricao: Pedágio do trecho rodoviário
+    grupo: rodoviario
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Pedágio", "Toll", "Tolls", "Vale Pedágio", "Taxa de Pedágio"]
+  - codigo: GRIS
+    descricao: Gerenciamento de risco do transporte
+    grupo: rodoviario
+    moeda_tipica: BRL
+    unidade: percentual
+    sinonimos: ["GRIS", "Gerenciamento de Risco", "Taxa de Gerenciamento de Risco", "Risk Management Fee", "Seguro de Risco"]
+  - codigo: AD_VALOREM_SEGURO
+    descricao: Seguro da carga (ad valorem)
+    grupo: rodoviario
+    moeda_tipica: BRL
+    unidade: percentual
+    sinonimos: ["Ad Valorem", "Seguro de Carga", "Cargo Insurance", "Seguro Ad Valorem", "Insurance Premium", "Prêmio de Seguro"]
+
+  # ------------------------------------------------------------- despacho
+  - codigo: HONORARIO_DESPACHO
+    descricao: Honorários do despachante aduaneiro
+    grupo: despacho
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Honorário de Despacho", "Honorários Despachante", "Customs Brokerage", "Customs Clearance Fee", "Brokerage Fee", "Taxa de Despacho Aduaneiro"]
+  - codigo: SDA
+    descricao: Contribuição ao sindicato dos despachantes aduaneiros
+    grupo: despacho
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["SDA", "Sindicato dos Despachantes Aduaneiros", "Taxa Sindical Despachantes", "Taxa SDA", "Contribuição Sindical Despachante"]
+  - codigo: EMISSAO_LI
+    descricao: Emissão de licença de importação (LI)
+    grupo: despacho
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Emissão de LI", "Licença de Importação", "LI Issuance", "Import License Fee", "Taxa de LI", "Licenciamento de Importação"]
+
+  # --------------------------------------------------------------- outros
+  - codigo: COURIER
+    descricao: Envio de documentos por courier
+    grupo: outros
+    moeda_tipica: BRL
+    unidade: por_processo
+    sinonimos: ["Courier", "Taxa de Courier", "Envio de Documentos", "Document Courier", "Express Document Delivery", "Malote"]
+  - codigo: HANDLING_AGENTE
+    descricao: Taxa de handling do agente no exterior
+    grupo: outros
+    moeda_tipica: USD
+    unidade: por_processo
+    sinonimos: ["Handling", "Handling Fee", "Agent Handling", "Handling do Agente", "Taxa de Handling", "Agent Fee"]

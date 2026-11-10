@@ -1,0 +1,69 @@
+[project]
+name = "confere-workspace"
+version = "0.0.0"
+description = "Raiz do workspace uv do Confere (não publicável)."
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["packages/core", "packages/synth", "apps/api"]
+
+[tool.uv.sources]
+confere-core = { workspace = true }
+confere-synth = { workspace = true }
+confere-api = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
+    "hypothesis>=6.140",
+    "ruff>=0.14",
+    "mypy>=1.18",
+    "types-PyYAML>=6.0",
+    "types-boto3[s3]>=1.43.127",
+    "pre-commit>=4.7.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["packages/core/src", "packages/synth/src", "apps/api/src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF", "N"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+strict = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = [
+    "ortools.*",
+    "fitz.*",
+    "nfelib.*",
+    "brazilfiscalreport.*",
+    "weasyprint.*",
+    "pgvector.*",
+    "magic.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["packages/core/tests", "packages/synth/tests", "apps/api/tests", "eval/tests"]
+addopts = "-q --strict-markers -m 'not llm'"
+markers = [
+    "slow: testes lentos",
+    "llm: chamam a API real do Gemini (pulados por padrão; rode com -m llm)",
+    "db: precisam de Postgres",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"apps/api/migrations/versions/*" = ["N999"]
+"apps/api/tests/test_storage.py" = ["N803"]  # kwargs do boto3 são CamelCase

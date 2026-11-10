@@ -1,0 +1,21 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: confere-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: confere
+      POSTGRES_PASSWORD: confere
+      POSTGRES_DB: confere
+    volumes:
+      - confere_pgdata:/var/lib/postgresql/data
+      - ./infra/db/01-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U confere -d confere"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  confere_pgdata:
