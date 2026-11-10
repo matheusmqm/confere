@@ -10,6 +10,12 @@ modelos:
   gemini-embedding-001:  # conferir preço vigente
     entrada_usd_por_milhao: 0.15
     saida_usd_por_milhao: 0
+  nvidia/nemotron-3.5-super-vl:free:  # OpenRouter, free
+    entrada_usd_por_milhao: 0
+    saida_usd_por_milhao: 0
+  google/gemma-4-31b-it:free:  # OpenRouter, free
+    entrada_usd_por_milhao: 0
+    saida_usd_por_milhao: 0
 # Usado quando o modelo não está listado acima.
 padrao:  # conferir preço vigente
   entrada_usd_por_milhao: 0.30
