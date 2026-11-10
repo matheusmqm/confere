@@ -1,0 +1,23 @@
+# Siglas e abreviações expandidas por `confere_core.costcode.normalizar.normalizar_descricao`
+# (CF-64). Chaves em minúsculas e sem acento. Uma passada só: o resultado não é expandido de novo.
+siglas:
+  dest: destino
+  orig: origem
+  thc: thc               # mantém a sigla como token
+  dthc: thc destino
+  othc: thc origem
+  b/l: bl
+  bl: bl
+  doc: documentacao
+  desc: desconsolidacao
+  armaz: armazenagem
+  mov: movimentacao
+  fee: taxa
+  charge: taxa
+  handling: manuseio
+  terminal handling charge: thc
+  capatazia: thc
+  w/m: wm
+
+# Palavras curtas sem valor para a classificação.
+stopwords: [de, da, do, the, of, for, a, o, e, and, per, por]
