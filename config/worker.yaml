@@ -1,0 +1,10 @@
+# Parâmetros do worker (CF-106).
+intervalo_sem_job_s: 0.5     # espera quando a fila está vazia
+job_preso_apos_min: 5        # job "executando" há mais que isso volta para a fila
+backoff_base_s: 5            # nova tentativa em 2^tentativas * base (+ jitter)
+backoff_jitter_s: 2
+timeouts_s:                  # por etapa do pipeline
+  classificar: 30
+  extrair: 60
+  codigos: 30
+  padrao: 10
