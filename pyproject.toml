@@ -62,6 +62,7 @@ module = [
     "confere_synth.compostos",
     "test_compostos",
     "confere_core.ingest.render",
+    "confere_core.ingest.arquivo",
     "confere_core.ingest",
     "confere_core.ingest.separar",
     "test_cte",
